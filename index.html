@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Swiss Banking New Joiner Portal</title>
+    <title>Swiss Banking New Joiner Portal | SKN CBBA Training</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: The plan is to transform the linear 3-day curriculum report into a thematic, non-linear interactive SPA. This is achieved with a persistent sidebar navigation that allows users to freely jump between "Banking Fundamentals," a "Swiss Bank Deep Dive" (with a bank selector), "Call Center Scenarios," "Mock Call Scripts," and the new "Terminology & Glossary." This structure is far more user-friendly for a call center agent who needs to find specific information quickly (e.g., "Facts on Pictet") rather than navigating a chronological training plan. -->
+    <!-- Application Structure Plan: The plan is to transform the linear 3-day curriculum report into a thematic, non-linear interactive SPA. This is achieved with a persistent sidebar navigation that allows users to freely jump between "Banking Fundamentals," a "Swiss Bank Deep Dive" (with a bank selector), "Call Center Scenarios," "Mock Call Scripts," "Bonuses & Incentives," and the new "Terminology & Glossary." This structure is far more user-friendly for a call center agent who needs to find specific information quickly (e.g., "Facts on Pictet") rather than navigating a chronological training plan. -->
     <!-- Visualization & Content Choices: Report Info: Bank names and founding years (e.g., "Founded 1819," "Roots since 1709"). Goal: Visually compare the deep heritage of the banks. Viz/Presentation: A horizontal bar chart (Chart.js) titled "Bank Heritage: Founding Years." Interaction: Hovering a bar reveals the exact year. Justification: This visual instantly conveys the "Swiss Advantage" and the difference in scale/history (e.g., Cramer vs. EFG) mentioned in the report, providing context that a simple list cannot. Other Interactions: Tabbed view for "3 Pillars," accordion for "Scenarios," and interactive modals for all quizzes/exams. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -161,10 +161,11 @@
         <aside class="w-64 bg-slate-800 text-gray-300 p-4 flex flex-col fixed h-full md:relative md:translate-x-0 transform -translate-x-full transition-transform duration-200 ease-in-out z-30" 
             :class="{'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open}">
             <div class="flex items-center mb-6">
-                <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-yellow-500 text-slate-900 font-bold text-xl">
-                    🇨🇭
+                <!-- SKN CBBA Logo Placeholder -->
+                <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-slate-100 text-yellow-600 font-bold text-xl border border-yellow-600">
+                    ★
                 </span>
-                <span class="ml-3 text-lg font-bold text-white">Banking Portal</span>
+                <span class="ml-3 text-lg font-bold text-white">SKN CBBA Training</span>
             </div>
             <nav class="flex-1">
                 <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'home' }" @click.prevent="activePage = 'home'; $store.sidebar.close()">
@@ -187,6 +188,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.515C20.442 8.783 20.356 9.176 20.088 9.368L13.848 13.528C13.58 13.72 13.187 13.634 12.995 13.366L6.755 9.206C6.487 9.014 6.4 8.621 6.592 8.353L12.832 4.193C13.1 4.001 13.493 4.087 13.685 4.355L20.25 8.515ZM19.5 12.5V18.75C19.5 19.302 19.052 19.75 18.5 19.75H7.5C6.948 19.75 6.5 19.302 6.5 18.75V12.5H19.5ZM12.75 16.5H13.75V17.5H12.75V16.5ZM10.5 16.5H11.5V17.5H10.5V16.5ZM8.25 16.5H9.25V17.5H8.25V16.5ZM16.75 16.5H17.75V17.5H16.75V16.5Z" /></svg>
                     Mock Call Scripts
                 </a>
+                <!-- NEW BONUS SECTION LINK -->
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'bonuses' }" @click.prevent="activePage = 'bonuses'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.109a24.29 24.29 0 0 1 1.3 0C18.666 3.11 22.5 7.152 22.5 12c0 4.848-3.834 8.89-9.85 8.89a24.29 24.29 0 0 1-1.3 0C5.334 20.89 1.5 16.848 1.5 12c0-4.848 3.834-8.89 9.85-8.89Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v3m-2.25 0h4.5M10.5 15h3" /></svg>
+                    Bonuses & Incentives
+                </a>
                 <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'glossary' }" @click.prevent="activePage = 'glossary'; $store.sidebar.close()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>
                     Terminology & Glossary
@@ -207,7 +213,7 @@
         <main class="flex-1 h-screen overflow-y-auto p-4 md:p-8">
             <!-- Mobile Header -->
             <div class="md:hidden flex justify-between items-center mb-4">
-                <span class="text-xl font-bold text-slate-800">Banking Portal</span>
+                <span class="text-xl font-bold text-slate-800">SKN CBBA Training</span>
                 <button @click="$store.sidebar.toggle()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -217,9 +223,9 @@
 
             <!-- Home Section -->
             <section x-show="activePage === 'home'">
-                <h1 class="text-4xl font-bold text-slate-800 mb-4">Welcome, New Joiner!</h1>
+                <h1 class="text-4xl font-bold text-slate-800 mb-4">SKN CBBA New Joiner Portal</h1>
                 <p class="text-lg text-gray-700 mb-6">
-                    This portal is your guide to the 3-Day Certification Program. Its goal is to provide you with the foundational knowledge of global banking and a deep, practical understanding of our key Swiss banking institutions.
+                    This portal is your guide to the 3-Day Certification Program, prepared by and for **SKN CBBA**. Its goal is to provide you with the foundational knowledge of global banking and a deep, practical understanding of our key Swiss banking institutions.
                 </p>
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h2 class="text-2xl font-semibold mb-4">How to Use This Portal</h2>
@@ -241,6 +247,9 @@
                         </li>
                         <li>
                             <strong class="text-slate-700">Terminology & Glossary:</strong> Quickly look up acronyms and definitions.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Bonuses & Incentives:</strong> Review the key metrics that determine your performance compensation.
                         </li>
                         <li>
                             <strong class="text-slate-700">Assessments:</strong> Test your knowledge with integrated quizzes and exams.
@@ -667,7 +676,260 @@
                 </div>
             </section>
 
-            <!-- Terminology & Glossary Section (NEW) -->
+            <!-- Mock Call Scripts Section (NEW) -->
+            <section x-show="activePage === 'mockcalls'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Mock Call Scripts (E2E Role-Play)</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    Use these full scripts for e2e (end-to-end) role-playing practice. Pay attention to compliance boundaries and the transition phrases used.
+                </p>
+
+                <h2 class="text-2xl font-semibold mb-4 text-slate-700">Part 1: Investment Inquiries (The Compliance Challenge)</h2>
+                <div class="space-y-4 mb-8">
+                    <!-- SCRIPT 1: Volatility Concern & RM Referral -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 1: Volatility Concern & RM Referral (Client asking for specific market view)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank quickly for calling [Bank Name]. This is [Agent Name]. How may I assist you?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Yes, this is Mr. Davies. I need to speak to someone about the NASDAQ index falling. Should I be selling my US tech shares? My portfolio is mostly equities.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you, Mr. Davies. I'd be happy to check your account. Could you please verify your date of birth and the last four digits of your account number?</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you. I see your portfolio. I must apply our compliance standard: I am here to provide operational support, but I cannot give market commentary or specific advice on whether to buy or sell. However, your Relationship Manager, Ms. Chen, can review your risk profile against the current market movements.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Well, I need advice now! What is the bank's *opinion* on tech stocks?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I completely understand the urgency. To ensure you receive a qualified, strategic response tailored to your profile, I need to connect you with Ms. Chen. Would you prefer I contact her now and ask her to call you back within the hour, or would you like me to connect you to her team lead for an immediate strategic discussion?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Connect me to her team lead, please.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Certainly, Mr. Davies. Please hold for one moment while I initiate a secure, soft transfer and brief them on your urgency. Thank you for your patience.</p>
+                            <p class="font-mono text-sm mb-2">**(Soft Transfer/Escalation)**</p>
+                        </div>
+                    </details>
+                    
+                    <!-- SCRIPT 2: AUM Fees & Statement Clarification -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 2: AUM Fees & Statement Clarification (Client questioning management charges)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for calling [Bank Name]. This is [Agent Name].</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I'm calling about my quarterly statement. There's a charge here labeled 'Management Fee AUM' that looks too high. What exactly is that?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I can certainly clarify that general term, Mr./Ms. [Client Name]. First, please confirm your security details: [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you. The 'Management Fee AUM' is the charge levied for the ongoing, professional administration and management of your total **Assets Under Management**. It covers the cost of research, trading, and continuous monitoring performed by your RM and the investment team.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I understand that, but the percentage seems high given the performance this quarter. I want to discuss reducing it.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I hear your concern regarding the performance and the fee structure. Discussions about commercial terms, such as fee negotiation or a detailed explanation of the calculation specific to your mandate, fall under the remit of your Relationship Manager, Mr. Smith. I will send a note to Mr. Smith requesting an urgent follow-up call dedicated solely to reviewing your fee structure and performance metrics. Is there anything else I can assist with operationally, such as a wire transfer or document request?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> No, just make sure Mr. Smith calls me today.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I have prioritized the message, and I will track this request until Mr. Smith confirms receipt. Thank you for your call.</p>
+                        </div>
+                    </details>
+                    
+                    <!-- SCRIPT 3: Liquidity Question (Selling a Private Equity Stake) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 3: Liquidity Question (Selling an illiquid Private Equity asset)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Good afternoon, [Bank Name], this is [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Hello. I need to liquidate my investment in the European Infrastructure Private Equity Fund immediately. How fast can that be done?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for your instruction, Mr./Ms. [Client]. Please verify your security information. [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I see the investment you reference. As you know, Private Equity funds are classified as **illiquid assets**. They are not traded daily like stocks or bonds. Selling requires identifying a buyer and following the fund's specific exit rules, which can take weeks or months.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Weeks? I need the cash next week!</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I understand the urgency. Given the liquidity constraints of this specific asset, I must transfer you directly to the **Alternative Investments Desk** and your RM, who can review two options: initiating the complex sale process or assessing if you qualify for a short-term liquidity solution, such as a Lombard Loan against your other liquid assets. Please hold for a seamless transfer.</p>
+                            <p class="font-mono text-sm mb-2">**(Transfer to Specialist Desk)**</p>
+                        </div>
+                    </details>
+                    
+                    <!-- SCRIPT 4: Market Research Request (UBS/Julius Baer Focus) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 4: Market Research Request (Requesting the latest CIO outlook)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> [Bank Name] Advisory Line, [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Hello, I'm a Julius Baer client. Can you send me the latest Chief Investment Office report? I'm specifically interested in the Asia forecast.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I'd be happy to ensure you receive that, as Julius Baer places strong focus on the Asia-Pacific region. Please verify [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank quickly dispatch a secure electronic copy of the "Global Outlook" to your registered email. For customized analysis of the Asian forecast relative to *your portfolio*, would you like me to schedule a brief follow-up call with your Relationship Manager?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Just send the report, thank you.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> It has been sent to [Client Email]. If you read the report and have strategic questions about your investment mandate, please call us back and we'll connect you directly to the appropriate advisory team. Thank you for using [Bank Name].</p>
+                            <p class="font-mono text-sm mb-2">**(End Call)**</p>
+                        </div>
+                    </details>
+                    
+                    <!-- SCRIPT 5: ESG Inquiry (Mirabaud/Pictet Focus) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 5: ESG Inquiry (Client asking about the sustainability mandate)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Good morning, [Bank Name]. [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I'm a Mirabaud client. I'm reviewing my investment mandate and want to ensure my investments fully reflect the bank's commitment to ESG. How is that measured?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for that important question, Mr./Ms. [Client]. Please verify your details. [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Mirabaud, as an independent firm, places a strong emphasis on sustainability and long-term value. We integrate ESG analysis directly into our investment decisions. To discuss how the ESG metrics are specifically applied to your portfolio's selection criteria, I must refer you to our specialist **Asset Management** team. They handle the nuanced scoring and screening process.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Can you transfer me now?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Absolutely. Please hold while I initiate the soft transfer and inform the Asset Management specialist about your query regarding the ESG scoring in your mandate.</p>
+                            <p class="font-mono text-sm mb-2">**(Transfer)**</p>
+                        </div>
+                    </details>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4 text-slate-700">Part 2: Swiss Account Opening & Operational Scripts</h2>
+                <div class="space-y-4">
+                    <!-- SCRIPT 6: Initial Inquiry & Qualification (New Prospect) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 6: Initial Inquiry & Qualification (Prospect call on minimum assets)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Good day. Thank you for calling [Bank Name] Business Development Line. This is [Agent Name].</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client (Prospect):</strong> Hello. I'm interested in opening a Swiss account, maybe with Julius Baer. I have about $800,000 to invest. Is that enough?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for considering us. We specialize in bespoke Private Banking for HNW individuals and families. While the specific minimum threshold can vary based on your location and service requirements, the standard entry point often begins at **$1 million in investable assets** for the fully personalized relationship.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client (Prospect):</strong> $800,000 is close. Can you make an exception?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I appreciate that. Exceptions are handled by our Senior Business Development Managers, who would need to understand your potential for growth and your long-term goals. To give you the correct answer, I need to connect you to a specialist who can conduct a confidential preliminary qualification discussion. Are you available now for a brief transfer?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client (Prospect):</strong> Yes, please.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Excellent. Please hold for our Business Development team. Thank you.</p>
+                            <p class="font-mono text-sm mb-2">**(Transfer to BDM)**</p>
+                        </div>
+                    </details>
+
+                    <!-- SCRIPT 7: Documentation & KYC Inquiry -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 7: Documentation & KYC Inquiry (Required documents)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> [Bank Name] Compliance and Onboarding, [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> My RM told me I need to send my 'Source of Wealth' documentation. What exactly does that mean?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for completing your **KYC (Know Your Client)** package, Mr./Ms. [Client]. Please verify [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Source of Wealth is a mandatory international compliance step. It simply requires documents proving how your assets were acquired. For example, if the wealth is from a business sale, we need the closing documents. If it's inherited, we need the estate documents. This is a critical step to ensure we comply with global anti-money laundering (AML) laws.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Can I just email you a summary?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I cannot receive that information, but your Relationship Manager and the Onboarding Team have a secure portal for document submission. I recommend you contact your RM, Ms. Jones, directly to upload these documents via the secure system. Would you like me to send you the secure portal link right now?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Yes, please send the link.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> The secure link is on its way. Thank you for your cooperation with this essential regulatory process.</p>
+                        </div>
+                    </details>
+
+                    <!-- SCRIPT 8: Foreign Currency Account Setup -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 8: Foreign Currency Account Setup (Operational task)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> [Bank Name] Account Services, [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I need to open a separate account in Singapore Dollars for my business. I'm a Pictet client.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I can process that request immediately for you. Pictet's network facilitates multi-currency accounts globally. Please verify [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank quickly. I have initiated the setup for the SGD sub-account under your master portfolio. This process typically takes **2 hours** for confirmation. You will receive a notification via your secure e-banking portal once the account is active.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Perfect. When can I transfer funds into it?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> You can initiate the internal transfer of funds as soon as you receive the active notification. If you require assistance with the **FX rate or the timing** of the transfer, please contact your Relationship Manager for advisory support. Is there anything else?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> No, thank you.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for calling [Bank Name].</p>
+                        </div>
+                    </details>
+
+                    <!-- SCRIPT 9: Cross-Border Branch Service Request (EFG Focus) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 9: Cross-Border Branch Service Request (Coordination between Zurich and Miami)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> [Bank Name] Global Services, [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I'm an EFG client traveling in Miami. I need to meet with someone urgently to sign some documents that are currently in the Zurich office. Is that possible?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> EFG operates globally with a strong presence in key international centers like Miami. Please verify [Security Questions].</p>
+                            <p class="font-mono text-sm mb-2">**(Verification Complete)**</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank quickly. I see the documentation. I need to coordinate with the **EFG Private Bank Miami** office to confirm their notary availability and verify the documents can be securely routed there for your signature. Please allow me a brief moment while I connect with the Miami team, or would you prefer a call back within 15 minutes?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Call me back in 15 minutes, please.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Confirmed. I will call you back on this verified number at [Time] with the availability of the Miami Client Relationship Officer. Your satisfaction is our priority. Goodbye for now, Mr./Ms. [Client].</p>
+                            <p class="font-mono text-sm mb-2">**(Log 15-minute Callback)**</p>
+                        </div>
+                    </details>
+
+                    <!-- SCRIPT 10: Succession Planning Inquiry (Legal Boundary) -->
+                    <details class="bg-white p-4 rounded-lg shadow-md border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Script 10: Succession Planning Inquiry (Requesting guidance on inheritance)
+                        </summary>
+                        <div class="mt-3 text-gray-700 p-2 border-l-4 border-yellow-500 bg-gray-50">
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> [Bank Name] Client Support, [Agent Name] speaking.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> My mother is a client of Banque Cramer, and she is starting the process of succession planning. Can you tell me what the legal steps are to transfer her assets upon her passing?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> I must first verify that you are authorized to discuss this matter. Are you listed as a primary contact or authorized signatory on your mother's account?</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> I am her son, but I don't have power of attorney yet.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Thank you for clarifying. Due to strict financial privacy regulations, I cannot discuss the legal steps of succession with you directly until we receive the appropriate legal documentation (such as power of attorney or trust documents). However, I can provide your mother with contact information for our **Wealth Structuring Advisory Team**, who specialize in these complex, multi-jurisdictional transfers. I can also send a discrete contact request to her Relationship Manager for an advisory call.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Client:</strong> Please send the request to her RM.</p>
+                            <p class="font-mono text-sm mb-2"><strong>Agent:</strong> Confirmed. I have prioritized a request to her RM regarding succession planning advice. We appreciate your understanding of our privacy policies.</p>
+                            <p class="font-mono text-sm mb-2">**(End Call)**</p>
+                        </div>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Bonuses Section (NEW) -->
+            <section x-show="activePage === 'bonuses'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Bonuses & Incentives: Performance Metrics</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    This section outlines the primary Key Performance Indicators (KPIs) that contribute to your semi-annual and annual bonus eligibility. Excellence in service, efficiency, and compliance are paramount.
+                </p>
+
+                <h2 class="text-2xl font-semibold mb-4 text-slate-700">Primary Performance Indicators (KPIs)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h3 class="text-xl font-bold text-yellow-600 mb-2">1. Client Satisfaction (CSAT)</h3>
+                        <p class="text-gray-700 mb-2">Measured via post-call surveys specific to your interaction quality and follow-up speed.</p>
+                        <ul class="text-sm list-disc list-inside ml-4 mt-2">
+                            <li>**Target:** Maintain score above 95%.</li>
+                            <li>**Impact:** Direct correlation to **Service Quality** component of bonus.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h3 class="text-xl font-bold text-yellow-600 mb-2">2. Efficient Resolution (FCR/AHT)</h3>
+                        <p class="text-gray-700 mb-2">Focus on First Call Resolution (FCR) and minimizing Average Handle Time (AHT) for routine operational tasks.</p>
+                        <ul class="text-sm list-disc list-inside ml-4 mt-2">
+                            <li>**Target:** FCR > 80% (Operational Inquiries only).</li>
+                            <li>**Impact:** Contributes to the **Productivity** component of bonus calculation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h3 class="text-xl font-bold text-yellow-600 mb-2">3. Compliance & Risk</h3>
+                        <p class="text-gray-700 mb-2">Zero tolerance for compliance failures (e.g., advising on investments, security breaches, failure to escalate Red Flags).</p>
+                        <ul class="text-sm list-disc list-inside ml-4 mt-2">
+                            <li>**Target:** Zero Compliance Incidents.</li>
+                            <li>**Impact:** A mandatory gateway; any breach results in **immediate bonus disqualification**.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4 mt-8 text-slate-700">Secondary Incentives (RM Support)</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <p class="mb-4">These metrics are tied to supporting the Relationship Managers (RMs) and driving growth in the Wealth Management division:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="font-bold text-slate-700">Qualified Lead Generation</h3>
+                            <p class="text-sm text-gray-600">Successfully qualifying and routing new prospect inquiries (>$1M in assets) to the Business Development Manager (BDM).</p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-700">CRM Documentation Quality</h3>
+                            <p class="text-sm text-gray-600">Completeness and timeliness of documenting all calls, especially those requiring complex follow-up or RM intervention.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4 mt-8 text-slate-700">Bonus Calculation Period</h2>
+                <p class="text-lg text-gray-700 mb-6">
+                    Performance is assessed quarterly for feedback, with the final bonus determination calculated **semi-annually** (June and December) based on the combined weighted average of all successful KPIs.
+                </p>
+                <!-- NEW INTERACTIVE LINK -->
+                <a href="SKNCBBA_Interactive.html" target="_blank" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-lg">
+                    Explore Interactive Tools & Simulations &rarr;
+                </a>
+            </section>
+
+            <!-- Terminology & Glossary Section (PREVIOUS CONTENT) -->
             <section x-show="activePage === 'glossary'">
                 <h1 class="text-4xl font-bold text-slate-800 mb-6">Terminology & Glossary (Quick Reference)</h1>
                 <p class="text-lg text-gray-700 mb-6">
@@ -705,6 +967,10 @@
                             <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
                                 <dt class="font-bold">PE</dt>
                                 <dd class="text-sm">Private Equity: Investments made directly into private companies. Typically illiquid and high risk/reward.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">Lombard Loan</dt>
+                                <dd class="text-sm">A specialized credit product where the client borrows money against their liquid investment assets (portfolio lending).</dd>
                             </div>
                         </dl>
                     </div>
