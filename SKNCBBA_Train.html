@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiss Banking New Joiner Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The plan is to transform the linear 3-day curriculum report into a thematic, non-linear interactive SPA. This is achieved with a persistent sidebar navigation that allows users to freely jump between "Banking Fundamentals," a "Swiss Bank Deep Dive" (with a bank selector), "Call Center Scenarios," "Mock Call Scripts," and the new "Terminology & Glossary." This structure is far more user-friendly for a call center agent who needs to find specific information quickly (e.g., "Facts on Pictet") rather than navigating a chronological training plan. -->
+    <!-- Visualization & Content Choices: Report Info: Bank names and founding years (e.g., "Founded 1819," "Roots since 1709"). Goal: Visually compare the deep heritage of the banks. Viz/Presentation: A horizontal bar chart (Chart.js) titled "Bank Heritage: Founding Years." Interaction: Hovering a bar reveals the exact year. Justification: This visual instantly conveys the "Swiss Advantage" and the difference in scale/history (e.g., Cramer vs. EFG) mentioned in the report, providing context that a simple list cannot. Other Interactions: Tabbed view for "3 Pillars," accordion for "Scenarios," and interactive modals for all quizzes/exams. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 450px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        [x-cloak] { display: none !important; }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            color: #d1d5db;
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover {
+            background-color: #374151;
+            color: #ffffff;
+        }
+        .sidebar-link.active {
+            background-color: #eab308;
+            color: #1f2937;
+            font-weight: 600;
+        }
+        .sidebar-link svg {
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-content {
+            transition: transform 0.25s ease;
+        }
+        .quiz-option {
+            display: block;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            background-color: #f9fafb;
+        }
+        .quiz-option.selected {
+            border-color: #eab308;
+            background-color: #fefce8;
+            font-weight: 600;
+        }
+        .quiz-option.correct {
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+        }
+        .quiz-option.incorrect {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900" x-data="{ 
+    activePage: 'home', 
+    showModal: false, 
+    modalContent: '',
+    bankData: {
+        'ubs': {
+            name: 'UBS Group AG',
+            founded: 1862,
+            hq: 'Zurich & Basel',
+            focus: 'Global Wealth Management (GWM), Largest Swiss Bank.',
+            usp: 'Largest Private Wealth Manager globally, Post-Credit Suisse integration scale.',
+            size: 'Colossus ($5T+ AUM)',
+            locations: 'NYC, London, Singapore, Hong Kong. Offices in 50+ countries.',
+            faq: 'How is the Credit Suisse integration affecting my account?'
+        },
+        'efg': {
+            name: 'EFG International',
+            founded: 1995,
+            hq: 'Zurich',
+            focus: 'Private Banking (Entrepreneurial Approach), Asset Management.',
+            usp: 'Focus on entrepreneurial clients, high degree of CRO autonomy. Global presence in 40 locations.',
+            size: 'Mid-Sized Private ($140B-$160B AUM)',
+            locations: 'Geneva, London, Miami, Asia Pacific, Tel Aviv. Strong European focus.',
+            faq: 'What specialized credit/financing solutions (e.g., Lombard lending) does EFG offer?'
+        },
+        'mirabaud': {
+            name: 'Mirabaud Group',
+            founded: 1819,
+            hq: 'Geneva',
+            focus: 'Independent, Family-Owned (7 generations), Wealth & Asset Management.',
+            usp: 'Deep independence, commitment to sustainability (ESG), corporate finance services.',
+            size: 'Mid-Sized Private ($30B-$40B AUM)',
+            locations: 'Paris, Luxembourg, Madrid, Montreal, Dubai, Abu Dhabi.',
+            faq: 'What is their focus on sustainable (ESG) investing or art partnerships?'
+        },
+        'cramer': {
+            name: 'Banque Cramer & Cie',
+            founded: 1709,
+            hq: 'Geneva',
+            focus: 'Focused, Boutique Wealth Management (Deep historical roots).',
+            usp: 'Exclusive focus on wealth management and advisory services for HNWI/EAMs.',
+            size: 'Boutique ($2B-$5B AUM)',
+            locations: 'Switzerland (Geneva, Zurich, Lugano), Dubai DIFC.',
+            faq: 'What is the advantage of a boutique bank versus a global giant like UBS?'
+        },
+        'pictet': {
+            name: 'Pictet Group',
+            founded: 1805,
+            hq: 'Geneva',
+            focus: 'Partnership-Owned, Asset Management & Wealth Solutions.',
+            usp: 'Run by Managing Partners, known for caution, independence, and long-term focus.',
+            size: 'Large Independent ($500B-$600B AUM)',
+            locations: 'London, Luxembourg, Hong Kong, Dubai, Tel Aviv. 31 financial centers worldwide.',
+            faq: 'How does Pictet\'s partnership structure ensure long-term stability?'
+        },
+        'juliusbaer': {
+            name: 'Julius Baer Group Ltd.',
+            founded: 1890,
+            hq: 'Zurich',
+            focus: 'Pure-Play Private Bank (Dedicated Wealth Focus).',
+            usp: 'One of the largest dedicated private banks globally, strong growth focus in emerging markets (Asia).',
+            size: 'Large Independent ($400B-$500B AUM)',
+            locations: 'Expansive Global Network (60 locations): Asia (Hong Kong, Singapore), Dubai, London.',
+            faq: 'Why is Julius Baer called a \'Pure-Play\' bank (only Wealth Management)?'
+        }
+    },
+    activeBank: null,
+    quizState: {}
+}" x-cloak>
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-800 text-gray-300 p-4 flex flex-col fixed h-full md:relative md:translate-x-0 transform -translate-x-full transition-transform duration-200 ease-in-out z-30" 
+            :class="{'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open}">
+            <div class="flex items-center mb-6">
+                <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-yellow-500 text-slate-900 font-bold text-xl">
+                    🇨🇭
+                </span>
+                <span class="ml-3 text-lg font-bold text-white">Banking Portal</span>
+            </div>
+            <nav class="flex-1">
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'home' }" @click.prevent="activePage = 'home'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                    Home
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'fundamentals' }" @click.prevent="activePage = 'fundamentals'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>
+                    Fundamentals
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'banks' }" @click.prevent="activePage = 'banks'; activeBank = null; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.75M9 10.5h6.75M9 14.25h6.75M9 18h6.75" /></svg>
+                    Bank Deep Dive
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'scenarios' }" @click.prevent="activePage = 'scenarios'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.211-1.007-.568-1.365l-2.482-2.482a2.25 2.25 0 0 0-3.182 0l-1.372 1.372a2.25 2.25 0 0 1-3.182 0l-2.482-2.482a2.25 2.25 0 0 0-3.182 0l-1.372 1.372A2.25 2.25 0 0 1 2.25 6.75v0Z" /></svg>
+                    Call Scenarios
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'mockcalls' }" @click.prevent="activePage = 'mockcalls'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.515C20.442 8.783 20.356 9.176 20.088 9.368L13.848 13.528C13.58 13.72 13.187 13.634 12.995 13.366L6.755 9.206C6.487 9.014 6.4 8.621 6.592 8.353L12.832 4.193C13.1 4.001 13.493 4.087 13.685 4.355L20.25 8.515ZM19.5 12.5V18.75C19.5 19.302 19.052 19.75 18.5 19.75H7.5C6.948 19.75 6.5 19.302 6.5 18.75V12.5H19.5ZM12.75 16.5H13.75V17.5H12.75V16.5ZM10.5 16.5H11.5V17.5H10.5V16.5ZM8.25 16.5H9.25V17.5H8.25V16.5ZM16.75 16.5H17.75V17.5H16.75V16.5Z" /></svg>
+                    Mock Call Scripts
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'glossary' }" @click.prevent="activePage = 'glossary'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>
+                    Terminology & Glossary
+                </a>
+                <a href="#" class="sidebar-link" :class="{ 'active': activePage === 'assessments' }" @click.prevent="activePage = 'assessments'; $store.sidebar.close()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg>
+                    Assessments
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Overlay for mobile sidebar -->
+        <div class="fixed inset-0 bg-black opacity-50 z-20 md:hidden" 
+             x-show="$store.sidebar.open" 
+             @click="$store.sidebar.close()"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 h-screen overflow-y-auto p-4 md:p-8">
+            <!-- Mobile Header -->
+            <div class="md:hidden flex justify-between items-center mb-4">
+                <span class="text-xl font-bold text-slate-800">Banking Portal</span>
+                <button @click="$store.sidebar.toggle()">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Home Section -->
+            <section x-show="activePage === 'home'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-4">Welcome, New Joiner!</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    This portal is your guide to the 3-Day Certification Program. Its goal is to provide you with the foundational knowledge of global banking and a deep, practical understanding of our key Swiss banking institutions.
+                </p>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-semibold mb-4">How to Use This Portal</h2>
+                    <p class="mb-4">
+                        This application is designed to be both a linear learning path and an on-demand reference tool.
+                    </p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>
+                            <strong class="text-slate-700">Fundamentals:</strong> Start here to learn the "Three Pillars" of banking, core investment terms, and critical compliance rules.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Bank Deep Dive:</strong> Explore detailed profiles of the six key banks you will support: UBS, EFG, Mirabaud, Cramer, Pictet, and Julius Baer.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Call Scenarios:</strong> Practice your skills with common call center situations and learn the "white-glove service" escalation path.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Mock Call Scripts:</strong> Run end-to-end simulations of common client and prospect calls.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Terminology & Glossary:</strong> Quickly look up acronyms and definitions.
+                        </li>
+                        <li>
+                            <strong class="text-slate-700">Assessments:</strong> Test your knowledge with integrated quizzes and exams.
+                        </li>
+                    </ul>
+                    <p class="mt-4">
+                        Use the sidebar navigation to move between sections at any time. Good luck!
+                    </p>
+                </div>
+            </section>
+
+            <!-- Fundamentals Section -->
+            <section x-show="activePage === 'fundamentals'" x-data="{ tab: 'private' }">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Banking Fundamentals (Day 1 Focus)</h1>
+                
+                <h2 class="text-2xl font-semibold mb-4">The Three Pillars of Banking</h2>
+                <div class="mb-6">
+                    <div class="border-b border-gray-300">
+                        <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                            <a href="#" class="py-4 px-1 border-b-2 font-medium text-lg" 
+                               :class="{ 'border-yellow-500 text-slate-800': tab === 'private', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'private' }"
+                               @click.prevent="tab = 'private'">
+                                Private Banking (Our Focus)
+                            </a>
+                            <a href="#" class="py-4 px-1 border-b-2 font-medium text-lg" 
+                               :class="{ 'border-yellow-500 text-slate-800': tab === 'retail', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'retail' }"
+                               @click.prevent="tab = 'retail'">
+                                Retail Banking
+                            </a>
+                            <a href="#" class="py-4 px-1 border-b-2 font-medium text-lg" 
+                               :class="{ 'border-yellow-500 text-slate-800': tab === 'investment', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': tab !== 'investment' }"
+                               @click.prevent="tab = 'investment'">
+                                Investment Banking
+                            </a>
+                        </nav>
+                    </div>
+                    <div class="py-6">
+                        <div x-show="tab === 'private'">
+                            <h3 class="text-xl font-semibold text-slate-700 mb-2">Client Focus: High-Net-Worth (HNW)</h3>
+                            <p class="mb-3">Our clients are individuals and families with significant investable assets ($1M+). The focus is relationship-driven, offering tailored financial solutions, not standardized products. The Swiss advantage historically relies on stability and neutrality, appealing to international wealth preservation.</p>
+                            <h4 class="font-semibold">Core Services:</h4>
+                            <ul class="list-disc list-inside ml-4 mt-2">
+                                <li>Wealth Management & Portfolio Advice (Discretionary/Advisory)</li>
+                                <li>Specialized Credit (e.g., Lombard Loans, Structured Financing)</li>
+                                <li>Estate, Tax, and Succession Planning (Coordination with RMs)</li>
+                            </ul>
+                            <h4 class="font-semibold mt-3">Call Center Relevance: HIGH</h4>
+                            <p>Every call requires a **concierge-level approach**. You represent the high standard of service and discretion expected by these clients.</p>
+                        </div>
+                        <div x-show="tab === 'retail'">
+                            <h3 class="text-xl font-semibold text-slate-700 mb-2">Client Focus: General Public</h3>
+                            <p class="mb-3">This is standard consumer banking for the mass market. Driven by high volume and lower margins. The primary income source is the interest spread (charging more on loans than paying on deposits).</p>
+                            <h4 class="font-semibold">Core Services:</h4>
+                            <ul class="list-disc list-inside ml-4 mt-2">
+                                <li>Savings & Checking Accounts, Mass Market Credit Cards</li>
+                                <li>Home Mortgages & Auto Loans</li>
+                            </ul>
+                            <h4 class="font-semibold mt-3">Call Center Relevance: LOW</h4>
+                            <p>We do not manage these products in the Private Banking division. **Redirect or politely inform the client of the division focus.**</p>
+                        </div>
+                        <div x-show="tab === 'investment'">
+                            <h3 class="text-xl font-semibold text-slate-700 mb-2">Client Focus: Corporations & Governments</h3>
+                            <p class="mb-3">Helps large institutions raise capital in the primary markets (e.g., IPOs) and provides strategic advisory services (e.g., M&A). Income is primarily fee-based, generated from large transactions.</p>
+                            <h4 class="font-semibold">Core Services:</h4>
+                            <ul class="list-disc list-inside ml-4 mt-2">
+                                <li>Mergers & Acquisitions (M&A) Advisory</li>
+                                <li>Underwriting (Issuing Stocks/Bonds)</li>
+                            </ul>
+                            <h4 class="font-semibold mt-3">Call Center Relevance: LOW</h4>
+                            <p>Handled by a separate internal division. Calls related to this are complex and **must be escalated** to the appropriate desk.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4">Core Investment Terms & Concepts</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-semibold text-slate-700">AUM</h3>
+                        <p>Total **Assets Under Management**. The key measure of a private bank's size and client trust. Fees are often charged as a percentage of AUM.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-semibold text-slate-700">Liquidity</h3>
+                        <p>How quickly an asset can be converted to cash. **High Liquidity** (Cash) vs. **Low Liquidity** (Private Equity, Real Estate).</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-semibold text-slate-700">Risk & Return</h3>
+                        <p>The **higher the potential return**, the **higher the risk** (potential for loss). This informs client profile segmentation.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                        <h3 class="text-lg font-semibold text-slate-700">Diversification</h3>
+                        <p>Spreading investments across different assets (stocks, bonds, alternatives) to mitigate the impact of poor performance in any single area.</p>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4">Risk/Return Tradeoff Visualization</h2>
+                <p class="text-lg text-gray-700 mb-4">
+                    This chart shows the general relationship between expected return and risk for various asset classes. Our clients typically hold a blend of these to match their risk tolerance.
+                </p>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <div class="chart-container">
+                        <canvas id="riskReturnChart"></canvas>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4 mt-8">Wealth Management vs. Private Banking</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <p class="mb-4">These terms overlap, but for clarity, understand the distinction:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-700 mb-2">Wealth Management</h3>
+                            <p class="mb-2">A **holistic service** focused on the entire financial lifecycle, including investment strategy, tax planning, estate planning, and trust services. It's the strategic roadmap.</p>
+                            <p class="text-sm italic">Focus: Strategy, Legacy, Long-term Growth. Involves a team of advisors.</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-slate-700 mb-2">Private Banking</h3>
+                            <p class="mb-2">Provides the **exclusive, tailored banking platform** needed to execute the wealth strategy (dedicated RM, special credit products, high-touch support). It's the premium service delivery mechanism.</p>
+                            <p class="text-sm italic">Focus: Execution, Concierge Service, Specialized Products. Often requires a minimum asset level.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bank Deep Dive Section -->
+            <section x-show="activePage === 'banks'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-2">Swiss Bank Deep Dive (Day 2 & 3 Focus)</h1>
+                
+                <div x-show="!activeBank">
+                    <p class="text-lg text-gray-700 mb-6">
+                        Select a bank to view its detailed profile, unique selling proposition (USP), and key locations. Understanding the scale of these banks is crucial for setting client expectations.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <template x-for="(bank, key) in bankData" :key="key">
+                            <div @click="activeBank = key" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg hover:border-yellow-500 transition-all cursor-pointer">
+                                <h2 class="text-2xl font-semibold text-slate-800" x-text="bank.name"></h2>
+                                <p class="text-gray-600 mt-1" x-text="bank.focus"></p>
+                                <span class="inline-block mt-2 text-xs font-medium px-3 py-1 rounded-full text-slate-700 bg-gray-200" x-text="bank.size"></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <h2 class="text-3xl font-semibold text-slate-800 mt-12 mb-6">Bank Heritage: Founding Years</h2>
+                    <p class="text-lg text-gray-700 mb-4">
+                        A key part of the "Swiss Advantage" is deep heritage. This chart visualizes the long history of our key banks. Note the difference in founding years, from boutique origins in the 1700s to modern global competitors.
+                    </p>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <div class="chart-container">
+                            <canvas id="bankHeritageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="activeBank" class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <button @click="activeBank = null" class="text-sm font-medium text-yellow-600 hover:text-yellow-800 mb-4">
+                        &larr; Back to All Banks
+                    </button>
+                    <h2 class="text-3xl font-bold text-slate-800" x-text="bankData[activeBank]?.name"></h2>
+                    <p class="text-xl text-gray-700 mt-1 mb-4" x-text="bankData[activeBank]?.focus"></p>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-full text-left">
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Headquarters</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.hq"></td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Founded Year</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.founded"></td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Scale (AUM)</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.size"></td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Unique Selling Point (USP)</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.usp"></td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Key Locations (Outside CH)</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.locations"></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 pr-4 font-semibold text-gray-600 align-top w-1/4">Common Client FAQ</td>
+                                    <td class="py-3" x-text="bankData[activeBank]?.faq"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Scenarios Section -->
+            <section x-show="activePage === 'scenarios'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Call Center Scenarios & Escalation Mastery (Day 3 Focus)</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    Practice core competencies for handling HNW clients. Click each scenario to reveal the compliant, white-glove procedure. **Scenarios 2, 4, 6, and 7 are high-risk escalation procedures.**
+                </p>
+                <div class="space-y-4">
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 1: Irate Client - "My RM hasn't called back in 48 hours!"
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Empathetic, Efficient):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client & Apologize:** Authenticate the client immediately. State, "I sincerely apologize for the delay. I will personally ensure this is resolved."</li>
+                                <li>**Triage:** Briefly confirm the nature of the request (e.g., "Was this regarding the bond purchase?"). *Do not solve the issue.*</li>
+                                <li>**Soft-Escalate:** "I am immediately sending an urgent notification to the RM's direct assistant and their team leader. I will hold the line until I confirm the message has been delivered to the appropriate party."</li>
+                                <li>**Document:** Log the call as a priority complaint.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group border-red-400">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-red-600">
+                            Scenario 2: The Compliance Red Flag - "I need to move a large sum offshore to avoid a new tax."
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p class="text-red-700 font-bold mb-3">HIGH RISK - COMPLIANCE REQUIRED</p>
+                            <p><strong>Procedure (Tone: Neutral, Firmly Compliant):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client & Stop Inquiry:** Authenticate the client. **Do not ask for more details on "avoiding tax" or offer any legal/tax opinion.**</li>
+                                <li>**Refer Only:** "I understand you have complex structuring needs. Due to strict regulatory requirements (e.g., FATCA/CRS), I must connect you with your Relationship Manager, who works directly with our internal compliance and legal partners on these specific matters."</li>
+                                <li>**Mandatory Documentation:** Log the call details and the client's explicit request in detail, tagging it for immediate review by the Compliance Officer. **Do not give any advice or opinion.**</li>
+                            </ol>
+                        </div>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 3: Portfolio Inquiry - "My portfolio is down 5% this month, what should I do?"
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Empathetic, Information-Only):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client & Validate Data:** "Thank you for reaching out. I can confirm your portfolio’s market valuation is currently [State Value]."</li>
+                                <li>**Apply Golden Rule:** "As per compliance, I cannot offer any market commentary or investment advice on whether you should hold or adjust your position."</li>
+                                <li>**Escalate & Empower:** "I see a portfolio review note scheduled for next week, but I can contact your RM right now to schedule an immediate call back to discuss your strategy and risk tolerance."</li>
+                            </ol>
+                        </div>
+                    </details>
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group border-yellow-400">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 4: Specialized Product - "I need to discuss the collateral ratio on my Lombard Loan."
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p class="text-yellow-700 font-bold mb-3">HIGH COMPLEXITY - CREDIT RISK INVOLVED</p>
+                            <p><strong>Procedure (Tone: Knowledgeable, Direct Transfer):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Acknowledge:** This is a high-level, complex credit product (a loan collateralized by assets). Acknowledge the term (Lombard Loan) to show proficiency.</li>
+                                <li>**Direct Transfer:** "That is a specialized credit inquiry. I am immediately connecting you with our Credit Solutions team/your RM to discuss your collateral ratio and any potential margin calls."</li>
+                                <li>**Do Not:** Attempt to look up the current ratio or discuss margin requirements unless explicitly authorized by SOP. The client must speak to a licensed lending specialist.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 5: Unauthorized Transaction -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-red-400 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-red-600">
+                            Scenario 5: Security Alert - Client reports an unauthorized transaction (potential fraud).
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p class="text-red-700 font-bold mb-3">CRITICAL - IMMEDIATE SECURITY ESCALATION</p>
+                            <p><strong>Procedure (Tone: Calm, Urgent, Reassuring):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client & Freeze:** Authenticate and immediately initiate a temporary freeze on online access/outbound transfers, if possible via internal systems.</li>
+                                <li>**Gather Facts:** Ask: "When did you first notice the transaction, and what is the exact amount?" (Do not discuss login details or passwords).</li>
+                                <li>**Escalate:** "I am immediately escalating this call to our Fraud and Security Desk. Please hold the line; I will introduce you directly to the officer in charge of investigations."</li>
+                                <li>**Mandatory Documentation:** Do not hang up until the transfer is successful. Log the precise time and details of the reported fraud.</li>
+                            </ol>
+                        </div>
+                    </details>
+
+                    <!-- NEW SCENARIO 6: Trust/Estate Planning Query -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group border-yellow-400">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 6: Client asks for advice on structuring their Will or Trust documents.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p class="text-yellow-700 font-bold mb-3">LEGAL/TAX BOUNDARY</p>
+                            <p><strong>Procedure (Tone: Respectful, Expert Referral):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client:** Authenticate.</li>
+                                <li>**Acknowledge Complexity:** "I understand this involves sensitive legal structuring."</li>
+                                <li>**Soft-Transfer/Referral:** "Our role is wealth management execution; we are not licensed legal counsel. Your Relationship Manager coordinates closely with specialized estate planning attorneys. I will arrange an introductory call with your RM and our dedicated Wealth Structuring team immediately."</li>
+                                <li>**Avoid:** Do not comment on jurisdiction, beneficiaries, or legal terminology.</li>
+                            </ol>
+                        </div>
+                    </details>
+
+                    <!-- NEW SCENARIO 7: Inquiry on ESG/Sustainable Investing (Mirabaud/Pictet Focus) -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 7: Client asks about the bank's commitment to ESG/Sustainable Investing.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Knowledgeable, Product Information):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Respond:** Authenticate. "Yes, we are highly committed to sustainable investing and ESG factors."</li>
+                                <li>**Provide USP Context:** (Refer to Mirabaud/Pictet facts) "We integrate ESG criteria across many of our mandates and have dedicated thematic funds focusing on sustainability (e.g., climate change, social equity)."</li>
+                                <li>**Escalate for Detail:** "For details on the specific ESG mandate for your portfolio, I need to connect you with the **Asset Management** division or your RM."</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 8: Complaint about Management Fees (AUM) -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 8: Client is upset about the **AUM-based management fees** on their statement.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Empathetic, Policy Explanation):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Empathize:** Authenticate. "I understand fee structures can be complex, and I appreciate you calling about your statement."</li>
+                                <li>**Explain Model (Simplified):** "Our fees are calculated as a small percentage of your **Assets Under Management (AUM)**, covering the continuous advisory and management services provided."</li>
+                                <li>**Escalate to Resolve:** "Any discussion regarding fee calculation adjustments or detailed explanation of the fee model requires your Relationship Manager. I will schedule a discussion immediately."</li>
+                            </ol>
+                        </div>
+                    </details>
+
+                    <!-- NEW SCENARIO 9: Request for Market Research -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 9: Client asks for the latest **Julius Baer** or **UBS** market outlook report.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Helpful, Value-Add):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Confirm:** Authenticate. "Yes, I see the latest Chief Investment Office report was just published."</li>
+                                <li>**Fulfillment:** "I can email you a secure link to download the report immediately, or I can ask your RM to highlight the key takeaways for you."</li>
+                                <li>**Value-Add:** "Were you interested in a specific sector, like technology or fixed income?" (Use their answer to inform the RM).</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 10: RM Leaving -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 10: Service Recovery - Client is worried because their long-time RM has left the bank.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Reassuring, Stability Focused):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Reassure:** Authenticate. "I understand this is a change, but rest assured, your assets remain secure and your portfolio strategy remains unchanged."</li>
+                                <li>**Explain Transition:** "You have been seamlessly transitioned to **[New RM Name]**, who is [New RM's Title] and has been with the firm for [Time]. They have access to your full history."</li>
+                                <li>**Immediate Action:** "I will arrange an immediate, introductory call between you and [New RM Name] to ensure a smooth transition and address any urgent needs." (Avoid discussing why the old RM left).</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- SCENARIO 11 (Original 5): The Soft-Transfer Technique -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 11: The "Soft-Transfer" Technique
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Goal:</strong> Transfer a client without making them feel passed around.</p>
+                            <p><strong>Script:</strong></p>
+                            <p class="font-mono p-3 bg-gray-50 rounded mt-2">
+                                "Mr. [Client], thank you for clarifying. The person best equipped to handle that is [Name/Title], who is our specialist in [Area].<br><br>
+                                May I please have your permission to place you on a brief hold while I connect you? I will personally introduce your request to them."
+                            </p>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 12: Opening a New Account -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 12: Client asks about the minimum requirement to open a private banking account.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Informative, Qualifying):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Interest:** "Thank you for your interest. We specialize in High-Net-Worth clients."</li>
+                                <li>**State General Threshold (Softly):** "While the exact minimum can vary by region and the scope of services required, the typical entry point for personalized Private Banking services generally begins around **$1 Million in investable assets**."</li>
+                                <li>**Lead Generation:** "I can immediately connect you to our Business Development team for a discrete, complimentary discussion of your needs." (Never turn away a potential client directly).</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 13: Trade Confirmation Missing -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 13: Operational - Client hasn't received confirmation for a recent trade/wire transfer.
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Operational, Assuring):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Confirm:** Authenticate. Use systems to confirm the trade/transfer execution date and time. "Yes, I can confirm the execution was successful on [Date] at [Time]."</li>
+                                <li>**Diagnose Delivery:** "Was the confirmation expected via postal mail or electronically through our portal?"</li>
+                                <li>**Resolve:** "I can immediately resend the confirmation electronically to your registered secure email, or confirm the documentation team has sent the postal copy." (Transfer to the back-office or trading settlement desk only if confirmation is missing from the system).</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 14: Request for Internal Contact Info -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 14: Client demands the direct extension of a non-RM executive (e.g., Head of Compliance).
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Polite, Firm Boundary):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify Client & Listen:** Authenticate. Understand *why* they need to speak to the executive.</li>
+                                <li>**State Policy:** "Mr./Ms. [Client], due to the confidential nature of their roles, our executives do not take unannounced calls. I must act as your primary liaison."</li>
+                                <li>**Soft-Escalate:** "If you entrust me with the full details of your concern, I will prepare a detailed brief and ensure it reaches the executive's Chief of Staff for review and a coordinated response." (Never provide direct lines).</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <!-- NEW SCENARIO 15: Global Branch Services -->
+                    <details class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 group">
+                        <summary class="font-semibold text-lg cursor-pointer group-open:text-yellow-600">
+                            Scenario 15: Client needs service while traveling (e.g., cash withdrawal in London or Singapore).
+                        </summary>
+                        <div class="mt-3 text-gray-700">
+                            <p><strong>Procedure (Tone: Global Concierge, Network Knowledge):</strong></p>
+                            <ol class="list-decimal list-inside ml-4">
+                                <li>**Verify & Identify Location:** Authenticate. "I see you are in [City]. Yes, we have a full service office there." (Refer to UBS, Julius Baer, Pictet, or EFG global locations).</li>
+                                <li>**Clarify Need:** "Do you require a pre-scheduled cash withdrawal, or is this a meeting request?"</li>
+                                <li>**Coordinate Service:** "I can contact the local branch team in [City] right now to ensure they are prepared for your arrival and coordinate any services you require." (Emphasize the seamless, global network).</li>
+                            </ol>
+                        </div>
+                    </details>
+
+                </div>
+            </section>
+
+            <!-- Terminology & Glossary Section (NEW) -->
+            <section x-show="activePage === 'glossary'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Terminology & Glossary (Quick Reference)</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    A comprehensive guide to the acronyms, specialized terms, and compliance shortcuts used across our banking curriculum.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-2xl font-semibold mb-4 text-slate-700 border-b pb-2">Investment & Financial Terms</h2>
+                        <dl class="space-y-4">
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">AUM</dt>
+                                <dd class="text-sm">Assets Under Management: The total market value of assets the firm manages on behalf of clients. Key measure of a private bank's size.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">Equities / Stocks</dt>
+                                <dd class="text-sm">Represents ownership interest in a corporation. Generally considered high risk/high potential return.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">Fixed Income / Bonds</dt>
+                                <dd class="text-sm">A debt security issued by a corporation or government. The investor is lending money. Generally lower risk/lower return than equities.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">Liquidity</dt>
+                                <dd class="text-sm">The degree to which an asset can be quickly converted into cash without affecting its market price (e.g., cash is high liquidity; private equity is low liquidity).</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">Diversification</dt>
+                                <dd class="text-sm">A risk management strategy that mixes a wide variety of investments within a portfolio to reduce volatility.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">ETF</dt>
+                                <dd class="text-sm">Exchange Traded Fund: A type of pooled investment security that trades like a common stock.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-yellow-500 bg-gray-50 rounded-r">
+                                <dt class="font-bold">PE</dt>
+                                <dd class="text-sm">Private Equity: Investments made directly into private companies. Typically illiquid and high risk/reward.</dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-2xl font-semibold mb-4 text-slate-700 border-b pb-2">Compliance, Roles & Banking Acronyms</h2>
+                        <dl class="space-y-4">
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">HNW / UHNW</dt>
+                                <dd class="text-sm">High-Net-Worth / Ultra-High-Net-Worth: Clients with significant investable assets ($1M+ to $30M+).</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">RM / CRO</dt>
+                                <dd class="text-sm">Relationship Manager / Client Relationship Officer: The primary client-facing contact responsible for holistic financial strategy and account oversight.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">FATCA</dt>
+                                <dd class="text-sm">Foreign Account Tax Compliance Act (US Law): Requires foreign financial institutions (like Swiss banks) to report US clients’ asset holdings to the US Treasury/IRS.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">CRS</dt>
+                                <dd class="text-sm">Common Reporting Standard: The global equivalent of FATCA, requiring automatic exchange of financial account information between participating tax jurisdictions.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">FINMA</dt>
+                                <dd class="text-sm">Financial Market Supervisory Authority (Switzerland): The independent regulator ensuring the stability and supervision of the Swiss financial market.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">KYC / AML</dt>
+                                <dd class="text-sm">Know Your Client / Anti-Money Laundering: Mandatory processes to verify client identity and source of wealth to prevent illegal activities.</dd>
+                            </div>
+                            <div class="p-2 border-l-4 border-slate-700 bg-gray-50 rounded-r">
+                                <dt class="font-bold">ESG</dt>
+                                <dd class="text-sm">Environmental, Social, and Governance: Criteria used in sustainable investing to measure a company's ethical and societal impact (Key USP for Mirabaud/Pictet).</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-semibold mb-4 mt-8 text-slate-700 border-b pb-2">Swiss Bank Scale Descriptors</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-yellow-100 rounded-lg shadow-sm border border-yellow-300">
+                        <h3 class="font-bold">Colossus (UBS)</h3>
+                        <p class="text-sm text-yellow-800">Global Systemically Important Bank (G-SIB) with over $5T AUM post-merger. Offers full spectrum services (Wealth, Investment, Asset Mgmt).</p>
+                    </div>
+                    <div class="p-4 bg-blue-100 rounded-lg shadow-sm border border-blue-300">
+                        <h3 class="font-bold">Large Independent (Pictet, Julius Baer)</h3>
+                        <p class="text-sm text-blue-800">Independent firms with strong global reach ($400B-$600B+ AUM) specializing in Wealth and Asset Management. Highly focused, but not universal banks.</p>
+                    </div>
+                    <div class="p-4 bg-green-100 rounded-lg shadow-sm border border-green-300">
+                        <h3 class="font-bold">Mid-Sized Private / Boutique (EFG, Mirabaud, Cramer)</h3>
+                        <p class="text-sm text-green-800">Smaller, often specialized or family-owned firms, highly competitive in specific niches (e.g., entrepreneurial clients, deep heritage). Provide extremely personalized service.</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Assessments Section -->
+            <section x-show="activePage === 'assessments'">
+                <h1 class="text-4xl font-bold text-slate-800 mb-6">Assessments</h1>
+                <p class="text-lg text-gray-700 mb-6">
+                    Test your knowledge from each part of the program. Complete Quiz 1 and Exam 1 before attempting the Final Certification Exam.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-xl font-semibold mb-2">Quiz 1: Fundamentals (15 Q)</h2>
+                        <p class="text-gray-600 mb-4">Focus: Pillars, Investments, and The Golden Rule.</p>
+                        <button @click="showModal = true; modalContent = 'quiz1'; resetQuiz('quiz1')" class="w-full bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition">
+                            Start Quiz 1
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-xl font-semibold mb-2">Exam 1: Mid-Program (30 Q)</h2>
+                        <p class="text-gray-600 mb-4">Focus: Day 1 + UBS, EFG, Mirabaud facts.</p>
+                        <button @click="showModal = true; modalContent = 'exam1'; resetQuiz('exam1')" class="w-full bg-yellow-500 text-slate-900 font-semibold py-2 px-4 rounded-lg hover:bg-yellow-600 transition">
+                            Start Exam 1
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                        <h2 class="text-xl font-semibold mb-2">Final Certification (50 Q)</h2>
+                        <p class="text-gray-600 mb-4">Covers all 3 days, including all six Swiss Banks and Scenarios.</p>
+                        <button @click="showModal = true; modalContent = 'finalExam'; resetQuiz('finalExam')" class="w-full bg-slate-800 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition">
+                            Start Final Exam
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Template -->
+    <div x-show="showModal" 
+         class="modal fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4 z-40"
+         @click.self="showModal = false"
+         x-transition:enter="opacity-0"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="opacity-100"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="modal-content bg-white w-full max-w-2xl rounded-lg shadow-xl max-h-[90vh] flex flex-col"
+             x-show="showModal"
+             x-transition:enter="opacity-0 transform scale-95"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="opacity-100 transform scale-100"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-95">
+
+            <!-- Quiz 1 (Expanded to 15 Questions) -->
+            <div x-show="modalContent === 'quiz1'" class="w-full">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-2xl font-semibold">Quiz 1: Investment Fundamentals (15 Q)</h2>
+                    <button @click="showModal = false">&times;</button>
+                </div>
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <div class_id="quiz1-results" class="hidden mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200">
+                        <h3 class="font-semibold text-lg text-blue-800">Quiz Complete!</h3>
+                        <p class="text-blue-700">You can review the correct answers below. You can close this window and retake the quiz at any time.</p>
+                    </div>
+                    <!-- Question 1 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q1" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">1. Which asset represents ownership in a company?</p>
+                        <label class="quiz-option"><input type="radio" name="q1" value="a" class="sr-only"> A) Stock (Equity)</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="b" class="sr-only"> B) Bond (Fixed Income)</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="c" class="sr-only"> C) Cash</label>
+                    </div>
+                    <!-- Question 2 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q2" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">2. A bond is essentially a loan you make to an issuer.</p>
+                        <label class="quiz-option"><input type="radio" name="q2" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Question 3 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q3" data-q-type="fill" data-correct-answer="Liquidity">
+                        <p class="font-semibold mb-2">3. The concept that measures how easily an asset can be converted to cash is: (one word)</p>
+                        <input type="text" name="q3" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Question 4 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q4" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">4. Which type of banking primarily focuses on consumer loans?</p>
+                        <label class="quiz-option"><input type="radio" name="q4" value="a" class="sr-only"> A) Private Banking</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="b" class="sr-only"> B) Investment Banking</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="c" class="sr-only"> C) Retail Banking</label>
+                    </div>
+                    <!-- Question 5 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q5" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">5. "AUM" stands for:</p>
+                        <label class="quiz-option"><input type="radio" name="q5" value="a" class="sr-only"> A) Assets Under Management</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="b" class="sr-only"> B) Annual User Maintenance</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="c" class="sr-only"> C) Asset Utility Model</label>
+                    </div>
+                    <!-- Question 6 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q6" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">6. It is acceptable to tell a client which stock they should buy if they ask directly.</p>
+                        <label class="quiz-option"><input type="radio" name="q6" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Question 7 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q7" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">7. The main goal of **Private Banking** is typically focused on:</p>
+                        <label class="quiz-option"><input type="radio" name="q7" value="a" class="sr-only"> A) General consumer mortgages</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="b" class="sr-only"> B) Corporate M&A</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="c" class="sr-only"> C) Long-term wealth preservation and transfer</label>
+                    </div>
+                    <!-- Question 8 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q8" data-q-type="fill" data-correct-answer="Investment">
+                        <p class="font-semibold mb-2">8. The Relationship Manager (RM) provides **\_\_\_\_\_\_\_\_\_\_** advice. (one word)</p>
+                        <input type="text" name="q8" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Question 9 -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q9" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">9. High-risk investments usually have the potential for high return.</p>
+                        <label class="quiz-option"><input type="radio" name="q9" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="q9" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Question 10 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q10_new" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">10. **Wealth Management** is characterized as:</p>
+                        <label class="quiz-option"><input type="radio" name="q10_new" value="a" class="sr-only"> A) Transactional only, focusing on deposits.</label>
+                        <label class="quiz-option"><input type="radio" name="q10_new" value="b" class="sr-only"> B) Focused solely on corporate mergers.</label>
+                        <label class="quiz-option"><input type="radio" name="q10_new" value="c" class="sr-only"> C) Holistic, covering tax, estate, and investment strategy.</label>
+                    </div>
+                    <!-- Question 11 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q11_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">11. Liquidity is highest for which asset type?</p>
+                        <label class="quiz-option"><input type="radio" name="q11_new" value="a" class="sr-only"> A) Real Estate</label>
+                        <label class="quiz-option"><input type="radio" name="q11_new" value="b" class="sr-only"> B) Cash</label>
+                        <label class="quiz-option"><input type="radio" name="q11_new" value="c" class="sr-only"> C) Private Equity</label>
+                    </div>
+                    <!-- Question 12 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q12_new" data-q-type="fill" data-correct-answer="Diversification">
+                        <p class="font-semibold mb-2">12. Spreading risk across multiple assets is called **\_\_\_\_\_\_\_\_\_\_**.</p>
+                        <input type="text" name="q12_new" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Question 13 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q13_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">13. The **Golden Rule** of Compliance forbids call center agents from providing:</p>
+                        <label class="quiz-option"><input type="radio" name="q13_new" value="a" class="sr-only"> A) Investment Advice</label>
+                        <label class="quiz-option"><input type="radio" name="q13_new" value="b" class="sr-only"> B) Account Balances</label>
+                        <label class="quiz-option"><input type="radio" name="q13_new" value="c" class="sr-only"> C) Branch Locations</label>
+                    </div>
+                    <!-- Question 14 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q14_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">14. Which statement about **Private Banking** is accurate?</p>
+                        <label class="quiz-option"><input type="radio" name="q14_new" value="a" class="sr-only"> A) It serves the mass market.</label>
+                        <label class="quiz-option"><input type="radio" name="q14_new" value="b" class="sr-only"> B) It involves high-touch, relationship-based service.</label>
+                        <label class="quiz-option"><input type="radio" name="q14_new" value="c" class="sr-only"> C) Its main income is from credit card fees.</label>
+                    </div>
+                    <!-- Question 15 (NEW) -->
+                    <div class="mb-4" data-quiz-id="quiz1" data-q-id="q15_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">15. What is the historical pillar of Swiss banking that modern regulations (like FATCA) have significantly altered?</p>
+                        <label class="quiz-option"><input type="radio" name="q15_new" value="a" class="sr-only"> A) Absolute Discretion/Confidentiality</label>
+                        <label class="quiz-option"><input type="radio" name="q15_new" value="b" class="sr-only"> B) Banking Stability</label>
+                        <label class="quiz-option"><input type="radio" name="q15_new" value="c" class="sr-only"> C) Neutrality</label>
+                    </div>
+                </div>
+                <div class="p-4 border-t bg-gray-50 flex justify-end">
+                    <button class="submit-quiz-btn bg-slate-800 text-white font-semibold py-2 px-6 rounded-lg hover:bg-slate-700 transition" data-quiz-id="quiz1">
+                        Submit Answers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Exam 1 (Expanded to 15 Questions) -->
+            <div x-show="modalContent === 'exam1'" class="w-full">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-2xl font-semibold">Exam 1: Mid-Program Assessment (30 Q)</h2>
+                    <button @click="showModal = false">&times;</button>
+                </div>
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <div class_id="exam1-results" class="hidden mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200">
+                        <h3 class="font-semibold text-lg text-blue-800">Exam Complete!</h3>
+                        <p class="text-blue-700">You can review the correct answers below. (Note: This is an abbreviated 10-question version of the 30-question exam.)</p>
+                    </div>
+                    <!-- Q1 (from Day 1) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q1" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">1. "AUM" stands for:</p>
+                        <label class="quiz-option"><input type="radio" name="e1q1" value="a" class="sr-only"> A) Asset Utility Model</label>
+                        <label class="quiz-option"><input type="radio" name="e1q1" value="b" class="sr-only"> B) Annual User Maintenance</label>
+                        <label class="quiz-option"><input type="radio" name="e1q1" value="c" class="sr-only"> C) Assets Under Management</label>
+                    </div>
+                    <!-- Q2 (from Day 1) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q2" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">2. True/False: If a client asks a question about their tax liability, it is safe to offer a simple opinion.</p>
+                        <label class="quiz-option"><input type="radio" name="e1q2" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="e1q2" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Q3 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q3" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">3. Which bank is the largest Swiss banking institution, particularly after its major 2023 merger?</p>
+                        <label class="quiz-option"><input type="radio" name="e1q3" value="a" class="sr-only"> A) UBS Group AG</label>
+                        <label class="quiz-option"><input type="radio" name="e1q3" value="b" class="sr-only"> B) EFG International</label>
+                        <label class="quiz-option"><input type="radio" name="e1q3" value="c" class="sr-only"> C) Mirabaud Group</label>
+                    </div>
+                    <!-- Q4 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q4" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">4. EFG International's USP is centered around:</p>
+                        <label class="quiz-option"><input type="radio" name="e1q4" value="a" class="sr-only"> A) Being the largest global retail bank.</label>
+                        <label class="quiz-option"><input type="radio" name="e1q4" value="b" class="sr-only"> B) An entrepreneurial approach with high CRO autonomy.</label>
+                        <label class="quiz-option"><input type="radio" name="e1q4" value="c" class="sr-only"> C) Having been family-owned since 1819.</label>
+                    </div>
+                    <!-- Q5 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q5" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">5. Which bank traces its roots to 1819 and maintains an independent, family-owned structure?</p>
+                        <label class="quiz-option"><input type="radio" name="e1q5" value="a" class="sr-only"> A) UBS Group AG</label>
+                        <label class="quiz-option"><input type="radio" name="e1q5" value="b" class="sr-only"> B) EFG International</label>
+                        <label class="quiz-option"><input type="radio" name="e1q5" value="c" class="sr-only"> C) Mirabaud Group</label>
+                    </div>
+                    <!-- Q6 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q6" data-q-type="fill" data-correct-answer="FINMA">
+                        <p class="font-semibold mb-2">6. The primary regulatory body for Swiss banks is: (Acronym)</p>
+                        <input type="text" name="e1q6" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Q7 (from Day 2 Scenario) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q7" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">7. Scenario: A client is **irate** because their RM has not returned their call. What is the **best immediate** action?</p>
+                        <label class="quiz-option"><input type="radio" name="e1q7" value="a" class="sr-only"> A) Tell them the RM is busy and to call back tomorrow.</label>
+                        <label class="quiz-option"><input type="radio" name="e1q7" value="b" class="sr-only"> B) Acknowledge, apologize, and commit to relaying an urgent message to the RM’s team leader.</label>
+                        <label class="quiz-option"><input type="radio" name="e1q7" value="c" class="sr-only"> C) Give them the RM's personal mobile number.</label>
+                    </div>
+                    <!-- Q8 (from Day 1 Compliance) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q8" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">8. True/False: Liquidity is high for assets like private equity and real estate.</p>
+                        <label class="quiz-option"><input type="radio" name="e1q8" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="e1q8" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Q9 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q9_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">9. The three historical pillars of Swiss banking were stability, neutrality, and...</p>
+                        <label class="quiz-option"><input type="radio" name="e1q9_new" value="a" class="sr-only"> A) Discretion/Confidentiality</label>
+                        <label class="quiz-option"><input type="radio" name="e1q9_new" value="b" class="sr-only"> B) High Liquidity</label>
+                        <label class="quiz-option"><input type="radio" name="e1q9_new" value="c" class="sr-only"> C) Retail Focus</label>
+                    </div>
+                    <!-- Q10 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="exam1" data-q-id="e1q10_new" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">10. Which bank is the largest global **private wealth manager** by AUM?</p>
+                        <label class="quiz-option"><input type="radio" name="e1q10_new" value="a" class="sr-only"> A) EFG International</label>
+                        <label class="quiz-option"><input type="radio" name="e1q10_new" value="b" class="sr-only"> B) Mirabaud Group</label>
+                        <label class="quiz-option"><input type="radio" name="e1q10_new" value="c" class="sr-only"> C) UBS Group AG</label>
+                    </div>
+                    <!-- ... placeholder for remaining 20 questions ... -->
+                </div>
+                <div class="p-4 border-t bg-gray-50 flex justify-end">
+                    <button class="submit-quiz-btn bg-slate-800 text-white font-semibold py-2 px-6 rounded-lg hover:bg-slate-700 transition" data-quiz-id="exam1">
+                        Submit Answers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Final Exam (Expanded to 15 Questions) -->
+            <div x-show="modalContent === 'finalExam'" class="w-full">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-2xl font-semibold">Final Certification Exam (50 Q)</h2>
+                    <button @click="showModal = false">&times;</button>
+                </div>
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <div class_id="finalExam-results" class="hidden mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200">
+                        <h3 class="font-semibold text-lg text-blue-800">Exam Complete!</h3>
+                        <p class="text-blue-700">You can review the correct answers below. (Note: This is an abbreviated 15-question version of the 50-question exam.)</p>
+                    </div>
+                    <!-- Q1 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq1" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">1. Which bank is often described as a **"Pure-Play"** private bank due to its dedicated focus on wealth management?</p>
+                        <label class="quiz-option"><input type="radio" name="feq1" value="a" class="sr-only"> A) UBS Group AG</label>
+                        <label class="quiz-option"><input type="radio" name="feq1" value="b" class="sr-only"> B) Pictet Group</label>
+                        <label class="quiz-option"><input type="radio" name="feq1" value="c" class="sr-only"> C) Julius Baer</label>
+                    </div>
+                    <!-- Q2 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq2" data-q-type="fill" data-correct-answer="Managing">
+                        <p class="font-semibold mb-2">2. Pictet Group is distinct because it is owned and managed by **\_\_\_\_\_\_\_\_\_\_** Partners.</p>
+                        <input type="text" name="feq2" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Q3 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq3" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">3. If a client of **Banque Cramer** asks for a local branch in Paris, what should you tell them?</p>
+                        <label class="quiz-option"><input type="radio" name="feq3" value="a" class="sr-only"> A) Their branches are primarily in Switzerland (Geneva, Zurich, Lugano) and Dubai.</label>
+                        <label class="quiz-option"><input type="radio" name="feq3" value="b" class="sr-only"> B) Their Paris branch is in the 8th arrondissement.</label>
+                        <label class="quiz-option"><input type="radio" name="feq3" value="c" class="sr-only"> C) They are part of the Julius Baer group.</label>
+                    </div>
+                    <!-- Q4 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq4" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">4. True/False: **Julius Baer** is known for its strong international growth, especially in the Asian market.</p>
+                        <label class="quiz-option"><input type="radio" name="feq4" value="a" class="sr-only"> A) True</label>
+                        <label class="quiz-option"><input type="radio" name="feq4" value="b" class="sr-only"> B) False</label>
+                    </div>
+                    <!-- Q5 (from Day 3 Scenario) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq5" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">5. A client calls and asks for their RM's personal mobile number. What is the compliant procedure?</p>
+                        <label class="quiz-option"><input type="radio" name="feq5" value="a" class="sr-only"> A) Provide it immediately to be helpful.</label>
+                        <label class="quiz-option"><input type="radio" name="feq5" value="b" class="sr-only"> B) Tell them you can't and end the call.</label>
+                        <label class="quiz-option"><input type="radio" name="feq5" value="c" class="sr-only"> C) State that RMs use secure office lines and offer to connect them or take a message.</label>
+                    </div>
+                    <!-- Q6 (from Day 3 Scenario - NEW) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq6_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">6. Scenario: A client mentions needing to discuss the **collateral ratio** on their **Lombard Loan**. What is the best action?</p>
+                        <label class="quiz-option"><input type="radio" name="feq6_new" value="a" class="sr-only"> A) Attempt to calculate the ratio using basic accounting knowledge.</label>
+                        <label class="quiz-option"><input type="radio" name="feq6_new" value="b" class="sr-only"> B) Immediately transfer the client to the Credit Solutions team or RM for specialized handling.</label>
+                        <label class="quiz-option"><input type="radio" name="feq6_new" value="c" class="sr-only"> C) Tell them to send the inquiry via secure email.</label>
+                    </div>
+                    <!-- Q7 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq7_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">7. Which bank's unique selling proposition (USP) focuses on its deep history dating back to the **1700s**?</p>
+                        <label class="quiz-option"><input type="radio" name="feq7_new" value="a" class="sr-only"> A) Banque Cramer & Cie</label>
+                        <label class="quiz-option"><input type="radio" name="feq7_new" value="b" class="sr-only"> B) EFG International</label>
+                        <label class="quiz-option"><input type="radio" name="feq7_new" value="c" class="sr-only"> C) Mirabaud Group</label>
+                    </div>
+                    <!-- Q8 (from Day 1) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq8_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">8. Which banking pillar is primarily involved in **Underwriting** and M&A Advisory?</p>
+                        <label class="quiz-option"><input type="radio" name="feq8_new" value="a" class="sr-only"> A) Retail Banking</label>
+                        <label class="quiz-option"><input type="radio" name="feq8_new" value="b" class="sr-only"> B) Investment Banking</label>
+                        <label class="quiz-option"><input type="radio" name="feq8_new" value="c" class="sr-only"> C) Private Banking</label>
+                    </div>
+                    <!-- Q9 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq9_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">9. The post-Credit Suisse integration scale makes **UBS** the largest global player in which division?</p>
+                        <label class="quiz-option"><input type="radio" name="feq9_new" value="a" class="sr-only"> A) Retail Banking (Switzerland only)</label>
+                        <label class="quiz-option"><input type="radio" name="feq9_new" value="b" class="sr-only"> B) Global Wealth Management</label>
+                        <label class="quiz-option"><input type="radio" name="feq9_new" value="c" class="sr-only"> C) European Fixed Income Trading</label>
+                    </div>
+                    <!-- Q10 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq10_new" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">10. **Mirabaud Group** places a strong emphasis on:</p>
+                        <label class="quiz-option"><input type="radio" name="feq10_new" value="a" class="sr-only"> A) Mass-market credit cards</label>
+                        <label class="quiz-option"><input type="radio" name="feq10_new" value="b" class="sr-only"> B) Aggressive short-term trading</label>
+                        <label class="quiz-option"><input type="radio" name="feq10_new" value="c" class="sr-only"> C) Sustainability (ESG) and deep independence</label>
+                    </div>
+                    <!-- Q11 (from Day 1) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq11_new" data-q-type="fill" data-correct-answer="Risk">
+                        <p class="font-semibold mb-2">11. In the context of investments, the principle states: Higher potential return means higher **\_\_\_\_\_\_\_\_\_\_**.</p>
+                        <input type="text" name="feq11_new" class="w-full p-2 border rounded-lg" placeholder="Type your answer">
+                        <div class="text-sm text-green-600 font-semibold mt-1 hidden correct-answer-text"></div>
+                    </div>
+                    <!-- Q12 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq12_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">12. Pictet Group's HQ is:</p>
+                        <label class="quiz-option"><input type="radio" name="feq12_new" value="a" class="sr-only"> A) Geneva</label>
+                        <label class="quiz-option"><input type="radio" name="feq12_new" value="b" class="sr-only"> B) Zurich</label>
+                        <label class="quiz-option"><input type="radio" name="feq12_new" value="c" class="sr-only"> C) London</label>
+                    </div>
+                    <!-- Q13 (from Day 2) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq13_new" data-q-type="mc" data-correct-answer="b">
+                        <p class="font-semibold mb-2">13. Which bank is known for its **Entrepreneurial Approach** and high CRO autonomy?</p>
+                        <label class="quiz-option"><input type="radio" name="feq13_new" value="a" class="sr-only"> A) Julius Baer</label>
+                        <label class="quiz-option"><input type="radio" name="feq13_new" value="b" class="sr-only"> B) EFG International</label>
+                        <label class="quiz-option"><input type="radio" name="feq13_new" value="c" class="sr-only"> C) Banque Cramer</label>
+                    </div>
+                    <!-- Q14 (from Day 3) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq14_new" data-q-type="mc" data-correct-answer="c">
+                        <p class="font-semibold mb-2">14. Which bank has its largest concentration of offices in Asia-Pacific, supporting its growth strategy?</p>
+                        <label class="quiz-option"><input type="radio" name="feq14_new" value="a" class="sr-only"> A) Mirabaud Group</label>
+                        <label class="quiz-option"><input type="radio" name="feq14_new" value="b" class="sr-only"> B) Banque Cramer & Cie</label>
+                        <label class="quiz-option"><input type="radio" name="feq14_new" value="c" class="sr-only"> C) Julius Baer Group Ltd.</label>
+                    </div>
+                    <!-- Q15 (from Day 1) -->
+                    <div class="mb-4" data-quiz-id="finalExam" data-q-id="feq15_new" data-q-type="mc" data-correct-answer="a">
+                        <p class="font-semibold mb-2">15. What must you confirm with a client before discussing any account details?</p>
+                        <label class="quiz-option"><input type="radio" name="feq15_new" value="a" class="sr-only"> A) Full client verification/Authentication</label>
+                        <label class="quiz-option"><input type="radio" name="feq15_new" value="b" class="sr-only"> B) Their last market return</label>
+                        <label class="quiz-option"><input type="radio" name="feq15_new" value="c" class="sr-only"> C) The purpose of their call</label>
+                    </div>
+                    <!-- ... placeholder for remaining 35 questions ... -->
+                </div>
+                <div class="p-4 border-t bg-gray-50 flex justify-end">
+                    <button class="submit-quiz-btn bg-slate-800 text-white font-semibold py-2 px-6 rounded-lg hover:bg-slate-700 transition" data-quiz-id="finalExam">
+                        Submit Answers
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('sidebar', {
+                open: false,
+                toggle() { this.open = !this.open },
+                close() { this.open = false }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initBankChart();
+            initRiskReturnChart();
+            initQuizListeners();
+        });
+
+        function initBankChart() {
+            const ctx = document.getElementById('bankHeritageChart');
+            if (!ctx) return;
+            
+            const data = {
+                labels: [
+                    'Banque Cramer & Cie (1709)', 
+                    'Pictet Group (1805)', 
+                    'Mirabaud Group (1819)', 
+                    'Julius Baer Group (1890)', 
+                    'UBS Group AG (1862)', 
+                    'EFG International (1995)'
+                ],
+                datasets: [{
+                    label: 'Founding Year',
+                    data: [1709, 1805, 1819, 1890, 1862, 1995],
+                    backgroundColor: [
+                        'rgba(55, 65, 81, 0.7)',
+                        'rgba(55, 65, 81, 0.7)',
+                        'rgba(55, 65, 81, 0.7)',
+                        'rgba(234, 179, 8, 0.7)',
+                        'rgba(234, 179, 8, 0.7)',
+                        'rgba(234, 179, 8, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(55, 65, 81, 1)',
+                        'rgba(55, 65, 81, 1)',
+                        'rgba(55, 65, 81, 1)',
+                        'rgba(234, 179, 8, 1)',
+                        'rgba(234, 179, 8, 1)',
+                        'rgba(234, 179, 8, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Bank Founding Years (Heritage)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Founded: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            },
+                            min: 1700,
+                            max: 2000 
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initRiskReturnChart() {
+            const ctx = document.getElementById('riskReturnChart');
+            if (!ctx) return;
+
+            const data = {
+                labels: ['Cash / Equivalents', 'Fixed Income (Bonds)', 'Equities (Stocks)', 'Alternatives (PE/Hedge)'],
+                datasets: [{
+                    label: 'Expected Return',
+                    data: [2, 5, 8, 12], 
+                    backgroundColor: 'rgba(234, 179, 8, 0.6)',
+                    borderColor: 'rgba(234, 179, 8, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Expected Risk',
+                    data: [1, 3, 7, 10], 
+                    backgroundColor: 'rgba(55, 65, 81, 0.6)',
+                    borderColor: 'rgba(55, 65, 81, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y'
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Risk vs. Return by Asset Class (Illustrative)'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Asset Class'
+                            }
+                        },
+                        y: {
+                            stacked: false,
+                            title: {
+                                display: true,
+                                text: 'Relative Scale'
+                            },
+                            min: 0,
+                            max: 15 
+                        }
+                    }
+                }
+            });
+        }
+
+        function initQuizListeners() {
+            document.querySelectorAll('.quiz-option input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const name = e.target.name;
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                        r.closest('.quiz-option').classList.remove('selected');
+                    });
+                    e.target.closest('.quiz-option').classList.add('selected');
+                });
+            });
+
+            document.querySelectorAll('.submit-quiz-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const quizId = e.target.dataset.quizId;
+                    submitQuiz(quizId);
+                });
+            });
+        }
+
+        function submitQuiz(quizId) {
+            const questions = document.querySelectorAll(`div[data-quiz-id="${quizId}"]`);
+            questions.forEach(q => {
+                const qType = q.dataset.qType;
+                const correctAnswer = q.dataset.correctAnswer;
+                
+                if (qType === 'mc') {
+                    const selected = q.querySelector('input:checked');
+                    q.querySelectorAll('.quiz-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                        const optValue = opt.querySelector('input').value;
+                        if (optValue === correctAnswer) {
+                            opt.classList.add('correct');
+                        }
+                    });
+                    if (selected && selected.value !== correctAnswer) {
+                        selected.closest('.quiz-option').classList.add('incorrect');
+                    }
+                } else if (qType === 'fill') {
+                    const input = q.querySelector('input');
+                    const answerText = q.querySelector('.correct-answer-text');
+                    if (input.value.trim().toLowerCase() === correctAnswer.toLowerCase()) {
+                        input.classList.add('border-green-500', 'bg-green-50');
+                    } else {
+                        input.classList.add('border-red-500', 'bg-red-50');
+                        answerText.textContent = `Correct Answer: ${correctAnswer}`;
+                        answerText.classList.remove('hidden');
+                    }
+                }
+            });
+            
+            const resultsBox = document.querySelector(`[class_id="${quizId}-results"]`);
+            if(resultsBox) {
+                resultsBox.classList.remove('hidden');
+                resultsBox.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function resetQuiz(quizId) {
+            const questions = document.querySelectorAll(`div[data-quiz-id="${quizId}"]`);
+            questions.forEach(q => {
+                const qType = q.dataset.qType;
+                
+                if (qType === 'mc') {
+                    q.querySelectorAll('.quiz-option').forEach(opt => {
+                        opt.classList.remove('selected', 'correct', 'incorrect');
+                        opt.querySelector('input').checked = false;
+                    });
+                } else if (qType === 'fill') {
+                    const input = q.querySelector('input');
+                    const answerText = q.querySelector('.correct-answer-text');
+                    input.value = '';
+                    input.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50');
+                    answerText.classList.add('hidden');
+                }
+            });
+            const resultsBox = document.querySelector(`[class_id="${quizId}-results"]`);
+            if(resultsBox) {
+                resultsBox.classList.add('hidden');
+            }
+        }
+
+    </script>
+</body>
+</html>

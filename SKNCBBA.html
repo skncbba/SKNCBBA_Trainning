@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKN CBBA | Interactive 3-Year Plan</title>
+    <!-- Chosen Palette: Warm Neutrals (Amber/Beige), Dark Slate, and Teal Accent -->
+    <!-- 
+      Application Structure Plan: 
+      The application transforms the static report into a dynamic, multi-section dashboard. The structure is thematic, not linear, to prioritize usability.
+      1. Header/Nav: Allows users to jump to the most relevant content (Overview, Growth, Financials, Strategy).
+      2. Overview (Default): Presents high-level KPIs (stat cards) and the core "Performance Pipeline" strategy, giving an instant summary.
+      3. Growth Plan: An interactive dashboard. The user clicks buttons for different time milestones. This action dynamically updates both a stacked bar chart (showing staff composition) and a line chart (showing cost growth), along with a text panel detailing the exact numbers. This interactively links staffing data to cost data.
+      4. Financials: A second dashboard, also driven by milestone buttons. This updates a stacked bar chart (Revenue vs. Cost/Profit) and a text panel. It also includes a static donut chart for the startup costs.
+      5. Strategy: A collapsible accordion section for the qualitative text (Services, Ops, Marketing, Milestones) to keep the UI clean.
+      This structure was chosen to make the data-heavy parts of the plan (growth, financials) explorable and to highlight the relationships between staffing, costs, and revenue over time, which is the core of the business plan.
+    -->
+    <!-- 
+      Visualization & Content Choices:
+      1. Staffing Data (Table) -> Goal: Show change & composition -> Viz: Stacked Bar Chart (StaffingChart) + Line Chart (CostChart). Interaction: Time-milestone buttons update bar chart data and highlight a point on the line chart. Justification: Visually connects the 1:5 staff ratio (composition) to the rising costs over time. Library: Chart.js (Canvas).
+      2. Financial Projections (Table) -> Goal: Compare/Show change -> Viz: Stacked Bar Chart (FinancialsChart). Interaction: Time-milestone buttons update the bar to show data for EOY 1, 2, or 3. Justification: Clearly visualizes revenue broken down into its two key components: costs and profit. Library: Chart.js (Canvas).
+      3. Startup Costs (List) -> Goal: Inform (Proportions) -> Viz: Donut Chart (StartupChart). Interaction: Static with tooltips. Justification: Best way to show parts-of-a-whole for a budget. Library: Chart.js (Canvas).
+      4. Services, Ops, Marketing, Milestones (Text) -> Goal: Organize -> Viz: HTML/Tailwind Accordion. Interaction: Click to show/hide. Justification: Manages large blocks of text effectively, preventing clutter on the data-driven dashboards. Method: Vanilla JS + Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 350px;
+            }
+        }
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:bg-amber-100 hover:text-slate-900 cursor-pointer;
+        }
+        .nav-link.active {
+            @apply bg-teal-100 text-teal-700 font-semibold;
+        }
+        .control-button {
+            @apply px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500;
+        }
+        .control-button.active {
+            @apply bg-teal-600 text-white border-teal-600 hover:bg-teal-700;
+        }
+        .toggle-btn {
+            @apply w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-sm hover:bg-amber-50 cursor-pointer;
+        }
+        .toggle-content {
+            @apply p-4 bg-white border border-t-0 border-slate-200 rounded-b-lg;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-slate-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-teal-700">SKN CBBA</span>
+                    <span class="text-2xl font-light text-slate-600 ml-2">Cross Border Bank Advisors</span>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-4">
+                    <a class="nav-link active" data-target="overview">Overview</a>
+                    <a class="nav-link" data-target="growth">Growth Plan</a>
+                    <a class="nav-link" data-target="financials">Financials</a>
+                    <a class="nav-link" data-target="strategy">Strategy</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- ======================= -->
+        <!--     OVERVIEW SECTION    -->
+        <!-- ======================= -->
+        <section id="overview">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Interactive 3-Year Business Plan</h1>
+                <p class="text-xl text-slate-600">Sep 2025 - Aug 2028</p>
+            </div>
+
+            <p class="text-lg text-slate-700 max-w-3xl mx-auto mb-12">
+                This interactive dashboard outlines the 3-year plan for SKN CBBA Solutions. Our mission is to be the leading BPO partner for the financial sector, built on a unique strategy of developing expert talent internally. Use the navigation to explore our growth projections, financial model, and operational strategy.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <span class="block text-5xl font-bold text-teal-600">1:10</span>
+                    <span class="block text-lg font-medium text-slate-700 mt-2">Consultant to Agent Ratio</span>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <span class="block text-5xl font-bold text-teal-600">~$2.9M</span>
+                    <span class="block text-lg font-medium text-slate-700 mt-2">Est. Annualized Profit by EOY 3</span>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <span class="block text-5xl font-bold text-teal-600">200</span>
+                    <span class="block text-lg font-medium text-slate-700 mt-2">Total Staff by EOY 3</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold text-slate-900 mb-4 text-center">Our Core Strategy: The Performance Pipeline</h3>
+                <p class="text-slate-700 mb-4">
+                    Our primary competitive advantage is our staffing model. We recruit promising Agents at a competitive rate and provide a clear career path, promoting top performers (at a 1:10 ratio) to highly-trained Banking Consultants.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                        <h4 class="text-xl font-semibold text-slate-800">Agent (Tier 1)</h4>
+                        <p class="text-slate-600 mt-2">Hired at <span class="font-bold">$650/month</span>. Responsible for high-volume, standard inquiries and monitored for quality, efficiency, and product knowledge.</p>
+                    </div>
+                    <div class="bg-teal-50 p-6 rounded-lg border border-teal-200">
+                        <h4 class="text-xl font-semibold text-teal-800">Banking Consultant (Tier 2/Lead)</h4>
+                        <p class="text-teal-700 mt-2">Promoted from the Agent pool to <span class="font-bold">$900/month</span>. They handle complex escalations and act as a Team Lead for 9 other agents.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!--   GROWTH PLAN SECTION   -->
+        <!-- ======================= -->
+        <section id="growth" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">3-Year Growth Plan</h1>
+            </div>
+            <p class="text-lg text-slate-700 max-w-3xl mx-auto mb-8">
+                Our growth is projected to scale aggressively but in a structured manner, maintaining our 1:10 ratio of Consultants to Agents as the team expands. Select a milestone below to see the detailed staffing and direct cost breakdown for that period. The line chart shows the cost trajectory across all milestones.
+            </p>
+
+            <div class="flex justify-center flex-wrap gap-2 mb-8" id="growth-controls">
+                <button class="control-button active" data-index="0">Sep 2025</button>
+                <button class="control-button" data-index="1">Oct 2025</button>
+                <button class="control-button" data-index="2">Dec 2025</button>
+                <button class="control-button" data-index="3">EOY 2026</button>
+                <button class="control-button" data-index="4">EOY 2027</button>
+                <button class="control-button" data-index="5">EOY 2028</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4" id="g-label">Sep 2025</h3>
+                    <div class="space-y-3 text-lg">
+                        <p id="g-staff" class="flex justify-between"><strong>Total Staff:</strong> <span class="font-semibold text-teal-700">1</span></p>
+                        <p id="g-agents" class="flex justify-between">Agents (Tier 1): <span class="font-semibold">1</span></p>
+                        <p id="g-consultants" class="flex justify-between">Consultants (Tier 2): <span class="font-semibold">0</span></p>
+                        <hr class="my-4">
+                        <p id="g-cost" class="flex justify-between text-xl"><strong>Monthly Staff Cost:</strong> <span class="font-bold text-teal-700">$650</span></p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold text-center mb-4">Staff Composition by Milestone</h4>
+                    <div class="chart-container">
+                        <canvas id="staffingChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h4 class="text-lg font-semibold text-center mb-4">Monthly Staff Cost Over Time</h4>
+                    <div class="chart-container">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!--   FINANCIALS SECTION    -->
+        <!-- ======================= -->
+        <section id="financials" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Financial Projections</h1>
+            </div>
+            <p class="text-lg text-slate-700 max-w-3xl mx-auto mb-8">
+                Our financial model is based on clear billing rates that provide significant value to clients while ensuring healthy margins. Select a milestone to see the projected monthly P&L. The donut chart shows the one-time startup capital required.
+            </p>
+
+            <div class="flex justify-center flex-wrap gap-2 mb-8" id="financials-controls">
+                <button class="control-button active" data-index="0">EOY 2026</button>
+                <button class="control-button" data-index="1">EOY 2027</button>
+                <button class="control-button" data-index="2">EOY 2028</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                <div class="lg:col-span-3 space-y-8">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4" id="f-label">End of Year 1 (Dec 2026)</h3>
+                        <div class="space-y-3 text-lg">
+                            <p id="f-revenue" class="flex justify-between"><strong>Total Monthly Revenue:</strong> <span class="font-semibold text-teal-700">$158,400</span></p>
+                            <p id="f-costs" class="flex justify-between">Total Monthly Costs: <span class="font-semibold text-red-600">$62,000</span></p>
+                            <p id="f-profit" class="flex justify-between"><strong>Est. Monthly Profit:</strong> <span class="font-semibold text-green-600">$96,400</span></p>
+                            <hr class="my-4">
+                            <p id="f-annual" class="flex justify-between text-xl"><strong>Est. Annualized Profit:</strong> <span class="font-bold text-teal-700">~$1.2M</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h4 class="text-lg font-semibold text-center mb-4">Monthly P&L by Milestone (Costs vs. Profit)</h4>
+                        <div class="chart-container">
+                            <canvas id="financialsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h4 class="text-lg font-semibold text-center mb-4">Initial Startup Costs Breakdown</h4>
+                        <div class="chart-container">
+                            <canvas id="startupChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-8">
+                    
+
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Revenue Calculation</h3>
+                        <p class="text-slate-600 mb-4">Our revenue model is based on two billing tiers:</p>
+                        <ul class="space-y-2 mb-4">
+                            <li class="flex justify-between text-lg">
+                                <span>Tier 1 Agent:</span>
+                                <span class="font-bold text-teal-700">$1,800 / mo</span>
+                            </li>
+                            <li class="flex justify-between text-lg">
+                                <span>Tier 2 Consultant:</span>
+                                <span class="font-bold text-teal-700">$3,600 / mo</span>
+                            </li>
+                        </ul>
+                        <p class="text-sm text-slate-500 bg-slate-50 p-3 rounded-md">
+                            <strong>Formula:</strong> (Agents × $1,800) + (Consultants × $3,600)
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Dynamic Revenue Calculator</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="calc-agents" class="block text-sm font-medium text-slate-700">Number of Agents (Tier 1)</label>
+                                <input type="number" id="calc-agents" value="72" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="calc-consultants" class="block text-sm font-medium text-slate-700">Number of Consultants (Tier 2)</label>
+                                <input type="number" id="calc-consultants" value="8" class="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm">
+                            </div>
+                            <button id="calc-button" class="w-full control-button active">Calculate</button>
+                            <div class="text-center pt-4 mt-4 border-t border-slate-200">
+                                <span class="text-slate-600">Calculated Monthly Revenue:</span>
+                                <span id="calc-revenue" class="block text-3xl font-bold text-teal-700 mt-1">$158,400</span>
+                            </div>
+                            <div class="text-center pt-4 mt-4 border-t border-slate-200">
+                                <span class="text-slate-600">Calculated Monthly Staff Cost:</span>
+                                <span id="calc-cost" class="block text-3xl font-bold text-red-600 mt-1">$54,000</span>
+                            </div>
+                            <div class="text-center pt-4 mt-4 border-t border-slate-200">
+                                <span class="text-slate-600">Calculated Monthly Profit:</span>
+                                <span id="calc-profit" class="block text-3xl font-bold text-green-600 mt-1">$104,400</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================= -->
+        <!--    STRATEGY SECTION     -->
+        <!-- ======================= -->
+        <section id="strategy" class="hidden">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-slate-900 mb-2">Strategy & Operations</h1>
+            </div>
+            <p class="text-lg text-slate-700 max-w-3xl mx-auto mb-8">
+                Our success is built on more than just numbers. It relies on a best-in-class operational framework, targeted sales, and rigorous execution of key milestones. Explore our core strategic components below.
+            </p>
+
+            <div class="max-w-4xl mx-auto space-y-4">
+                <div class="toggle-container">
+                    <button class="toggle-btn" data-target="content-services">
+                        <span class="text-xl font-semibold text-slate-800">Services Offered</span>
+                        <span class="toggle-icon text-2xl font-light text-slate-500">+</span>
+                    </button>
+                    <div id="content-services" class="toggle-content hidden">
+                        <h5 class="text-lg font-semibold mb-2">Tier 1 Agent Support:</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Inbound account inquiries</li>
+                            <li>Transaction history</li>
+                            <li>Password/PIN resets</li>
+                            <li>General product questions</li>
+                            <li>Tier 1 technical support (app/website)</li>
+                        </ul>
+                        <h5 class="text-lg font-semibold mt-4 mb-2">Banking Consultant (Tier 2):</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Complex issue resolution</li>
+                            <li>Loan and mortgage inquiries</li>
+                            <li>Fraud/dispute management</li>
+                            <li>Customer retention and de-escalation</li>
+                            <li>Product upselling</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="toggle-container">
+                    <button class="toggle-btn" data-target="content-ops">
+                        <span class="text-xl font-semibold text-slate-800">Operations & Technology</span>
+                        <span class="toggle-icon text-2xl font-light text-slate-500">+</span>
+                    </button>
+                    <div id="content-ops" class="toggle-content hidden">
+                        <ul class="list-disc list-inside text-slate-600 space-y-2">
+                            <li><strong>Operational Model:</strong> Global, remote-first workforce to optimize costs and access a wide talent pool.</li>
+                            <li><strong>Technology (CRM):</strong> Cloud-based system (e.g., Zendesk, Salesforce) for interaction management.</li>
+                            <li><strong>Technology (VoIP):</strong> Robust system with IVR, call recording, and advanced analytics.</li>
+                            <li><strong>Security (Mandatory):</strong> All staff use VPNs with endpoint device management. All protocols are compliant with financial regulations (PCI, GDPR).</li>
+                            <li><strong>Training:</strong> 2-week mandatory onboarding for soft skills, client products, and banking compliance. A separate 4-week module for promotion to Consultant.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="toggle-container">
+                    <button class="toggle-btn" data-target="content-sales">
+                        <span class="text-xl font-semibold text-slate-800">Marketing & Sales Strategy</span>
+                        <span class="toggle-icon text-2xl font-light text-slate-500">+</span>
+                    </button>
+                    <div id="content-sales" class="toggle-content hidden">
+                        <h5 class="text-lg font-semibold mb-2">Target Market:</h5>
+                        <p class="text-slate-600 mb-4">Small to mid-sized banks (under $15B assets), regional credit unions, and Series A+ fintech startups.</p>
+                        <h5 class="text-lg font-semibold mb-2">Year 1 Strategy:</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Founder-led B2B outreach.</li>
+                            <li>Target VPs of Operations and Heads of Customer Support via LinkedIn.</li>
+                            <li>Develop case studies from first clients.</li>
+                        </ul>
+                        <h5 class="text-lg font-semibold mt-4 mb-2">Year 2-3 Strategy:</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Hire a dedicated Sales/Partnership Manager.</li>
+                            <li>Attend key industry trade shows (e.g., Money 20/20).</li>
+                            <li>Build a formal client referral program.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="toggle-container">
+                    <button class="toggle-btn" data-target="content-milestones">
+                        <span class="text-xl font-semibold text-slate-800">Key Milestones (3-Year Roadmap)</span>
+                        <span class="toggle-icon text-2xl font-light text-slate-500">+</span>
+                    </button>
+                    <div id="content-milestones" class="toggle-content hidden">
+                        <h5 class="text-lg font-semibold mb-2">Year 1 (Sep 2025 - Aug 2026):</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Q3 2025: Onboard Agent #1 and secure first client.</li>
+                            <li>Q4 2025: Scale to 10 staff and 2-3 clients.</li>
+                            <li>Q2 2026: Promote first cohort to Banking Consultants.</li>
+                            <li>Q3 2026: Reach 50+ staff.</li>
+                        </ul>
+                        <h5 class="text-lg font-semibold mt-4 mb-2">Year 2 (Sep 2026 - Aug 2027):</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Q4 2026: Successfully hit 80-person staff goal.</li>
+                            <li>Q1 2027: Hire dedicated Operations and Sales Managers.</li>
+                            <li>Q3 2027: Secure a "flagship" client.</li>
+                            <li>Q4 2027: Reach 150-person staff goal.</li>
+                        </ul>
+                        <h5 class="text-lg font-semibold mt-4 mb-2">Year 3 (Sep 2027 - Aug 2028):</h5>
+                        <ul class="list-disc list-inside text-slate-600 space-y-1">
+                            <li>Q1 2028: Achieve <15% annual staff attrition.</li>
+                            <li>Q2 2028: Achieve 95%+ client retention.</li>
+                            <li>Q3 2028: Reach 200-person staff goal.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 mt-12 border-t border-slate-200">
+        <p class="text-sm text-slate-500">Prime-Core Financial Solutions | Confidential Business Plan</p>
+    </footer>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DATA ---
+            const growthData = [
+                { label: 'Sep 2025', total: 1, agents: 1, consultants: 0, cost: 650 },
+                { label: 'Oct 2025', total: 4, agents: 4, consultants: 0, cost: 2600 },
+                { label: 'Dec 2025', total: 10, agents: 9, consultants: 1, cost: 6750 },
+                { label: 'EOY 2026', total: 80, agents: 72, consultants: 8, cost: 54000 },
+                { label: 'EOY 2027', total: 150, agents: 135, consultants: 15, cost: 101250 },
+                { label: 'EOY 2028', total: 200, agents: 180, consultants: 20, cost: 135000 }
+            ];
+
+            const financialData = [
+                { label: 'EOY 2026', revenue: 158400, costs: 62000, profit: 96400, annual: "~$1.2M" },
+                { label: 'EOY 2027', revenue: 297000, costs: 116250, profit: 180750, annual: "~$2.2M" },
+                { label: 'EOY 2028', revenue: 396000, costs: 157000, profit: 239000, annual: "~$2.9M" }
+            ];
+
+            const startupData = {
+                labels: ['Software Setup', 'Salary Buffer', 'Contingency', 'Marketing', 'Legal'],
+                data: [5000, 7800, 4200, 2000, 1000]
+            };
+            
+            const currencyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 });
+
+            // --- CHART GLOBALS ---
+            let staffingChart, costChart, financialsChart, startupChart;
+            const chartColors = {
+                agent: 'rgba(56, 189, 248, 0.7)', // sky-400
+                consultant: 'rgba(20, 184, 166, 0.7)', // teal-500
+                cost: 'rgba(239, 68, 68, 0.7)', // red-500
+                profit: 'rgba(34, 197, 94, 0.7)', // green-500
+                revenue: 'rgba(67, 56, 202, 0.7)' // indigo-700
+            };
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    label += currencyFormatter.format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, beginAtZero: true }
+                }
+            };
+
+            // --- NAVIGATION ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main > section');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.currentTarget.getAttribute('data-target');
+
+                    sections.forEach(sec => sec.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                });
+            });
+
+            // --- GROWTH DASHBOARD ---
+            const growthControls = document.getElementById('growth-controls');
+            const gLabel = document.getElementById('g-label');
+            const gStaff = document.getElementById('g-staff');
+            const gAgents = document.getElementById('g-agents');
+            const gConsultants = document.getElementById('g-consultants');
+            const gCost = document.getElementById('g-cost');
+
+            function renderStaffingChart() {
+                const ctx = document.getElementById('staffingChart').getContext('2d');
+                const initialData = growthData[0];
+                staffingChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [initialData.label],
+                        datasets: [
+                            { label: 'Agents', data: [initialData.agents], backgroundColor: chartColors.agent },
+                            { label: 'Consultants', data: [initialData.consultants], backgroundColor: chartColors.consultant }
+                        ]
+                    },
+                    options: { ...chartOptions, plugins: { legend: { display: true }, tooltip: {}} }
+                });
+            }
+
+            function renderCostChart() {
+                const ctx = document.getElementById('costChart').getContext('2d');
+                costChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: growthData.map(d => d.label),
+                        datasets: [{
+                            label: 'Monthly Staff Cost',
+                            data: growthData.map(d => d.cost),
+                            borderColor: chartColors.cost,
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointBackgroundColor: 'rgba(239, 68, 68, 0.7)',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: { ...chartOptions, scales: { x: {}, y: { beginAtZero: true } } }
+                });
+            }
+            
+            function updateGrowthDashboard(index) {
+                const data = growthData[index];
+                
+                gLabel.textContent = data.label;
+                gStaff.innerHTML = `<strong>Total Staff:</strong> <span class="font-semibold text-teal-700">${data.total}</span>`;
+                gAgents.innerHTML = `Agents (Tier 1): <span class="font-semibold">${data.agents}</span>`;
+                gConsultants.innerHTML = `Consultants (Tier 2): <span class="font-semibold">${data.consultants}</span>`;
+                gCost.innerHTML = `<strong>Monthly Staff Cost:</strong> <span class="font-bold text-teal-700">${currencyFormatter.format(data.cost)}</span>`;
+                
+                staffingChart.data.labels = [data.label];
+                staffingChart.data.datasets[0].data = [data.agents];
+                staffingChart.data.datasets[1].data = [data.consultants];
+                staffingChart.update();
+
+                costChart.data.datasets[0].pointRadius = growthData.map((_, i) => i == index ? 8 : 5);
+                costChart.data.datasets[0].pointBackgroundColor = growthData.map((_, i) => i == index ? 'rgba(220, 38, 38, 1)' : 'rgba(239, 68, 68, 0.7)');
+                costChart.update();
+                
+                growthControls.querySelectorAll('button').forEach((btn, i) => {
+                    btn.classList.toggle('active', i == index);
+                });
+            }
+
+            // --- FINANCIALS DASHBOARD ---
+            const financialsControls = document.getElementById('financials-controls');
+            const fLabel = document.getElementById('f-label');
+            const fRevenue = document.getElementById('f-revenue');
+            const fCosts = document.getElementById('f-costs');
+            const fProfit = document.getElementById('f-profit');
+            const fAnnual = document.getElementById('f-annual');
+
+            const agentInput = document.getElementById('calc-agents');
+            const consultantInput = document.getElementById('calc-consultants');
+            const calculateBtn = document.getElementById('calc-button');
+            const resultRevenue = document.getElementById('calc-revenue');
+            const resultCost = document.getElementById('calc-cost');
+            const resultProfit = document.getElementById('calc-profit');
+
+            function renderFinancialsChart() {
+                const ctx = document.getElementById('financialsChart').getContext('2d');
+                const initialData = financialData[0];
+                financialsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [initialData.label],
+                        datasets: [
+                            { label: 'Est. Monthly Profit', data: [initialData.profit], backgroundColor: chartColors.profit },
+                            { label: 'Total Monthly Costs', data: [initialData.costs], backgroundColor: chartColors.cost }
+                        ]
+                    },
+                    options: { ...chartOptions }
+                });
+            }
+
+            function renderStartupChart() {
+                const ctx = document.getElementById('startupChart').getContext('2d');
+                startupChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: startupData.labels,
+                        datasets: [{
+                            data: startupData.data,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(239, 68, 68, 0.7)',
+                                'rgba(245, 158, 11, 0.7)',
+                                'rgba(16, 185, 129, 0.7)',
+                                'rgba(107, 114, 128, 0.7)'
+                            ]
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed !== null) {
+                                            label += currencyFormatter.format(context.parsed);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function updateFinancialsDashboard(index) {
+                const data = financialData[index];
+
+                fLabel.textContent = data.label;
+                fRevenue.innerHTML = `<strong>Total Monthly Revenue:</strong> <span class="font-semibold text-teal-700">${currencyFormatter.format(data.revenue)}</span>`;
+                fCosts.innerHTML = `Total Monthly Costs: <span class="font-semibold text-red-600">${currencyFormatter.format(data.costs)}</span>`;
+                fProfit.innerHTML = `<strong>Est. Monthly Profit:</strong> <span class="font-semibold text-green-600">${currencyFormatter.format(data.profit)}</span>`;
+                fAnnual.innerHTML = `<strong>Est. Annualized Profit:</strong> <span class="font-bold text-teal-700">${data.annual}</span>`;
+
+                financialsChart.data.labels = [data.label];
+                financialsChart.data.datasets[0].data = [data.profit];
+                financialsChart.data.datasets[1].data = [data.costs];
+                financialsChart.update();
+                
+                financialsControls.querySelectorAll('button').forEach((btn, i) => {
+                    btn.classList.toggle('active', i == index);
+                });
+
+                const growthMap = { 0: 3, 1: 4, 2: 5 };
+                const relatedGrowthData = growthData[growthMap[index]];
+                if (relatedGrowthData) {
+                    agentInput.value = relatedGrowthData.agents;
+                    consultantInput.value = relatedGrowthData.consultants;
+                    updateDynamicCalculator();
+                }
+            }
+
+            function updateDynamicCalculator() {
+                const agents = parseInt(agentInput.value) || 0;
+                const consultants = parseInt(consultantInput.value) || 0;
+                
+                const revenue = (agents * 1800) + (consultants * 3600);
+                const cost = (agents * 650) + (consultants * 900);
+                const profit = revenue - cost;
+
+                resultRevenue.textContent = currencyFormatter.format(revenue);
+                resultCost.textContent = currencyFormatter.format(cost);
+                resultProfit.textContent = currencyFormatter.format(profit);
+            }
+
+            // --- STRATEGY TOGGLES ---
+            document.querySelectorAll('.toggle-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = document.getElementById(button.getAttribute('data-target'));
+                    const icon = button.querySelector('.toggle-icon');
+                    const isHidden = content.classList.contains('hidden');
+                    
+                    content.classList.toggle('hidden');
+                    icon.textContent = isHidden ? '−' : '+';
+                });
+            });
+
+            // --- ATTACH CLICK HANDLERS ---
+            growthControls.addEventListener('click', (e) => {
+                const button = e.target.closest('button.control-button');
+                if (button) {
+                    const index = button.getAttribute('data-index');
+                    if (index !== null) {
+                        updateGrowthDashboard(parseInt(index, 10));
+                    }
+                }
+            });
+
+            financialsControls.addEventListener('click', (e) => {
+                const button = e.target.closest('button.control-button');
+                if (button) {
+                    const index = button.getAttribute('data-index');
+                    if (index !== null) {
+                        updateFinancialsDashboard(parseInt(index, 10));
+                    }
+                }
+            });
+
+            calculateBtn.addEventListener('click', updateDynamicCalculator);
+
+            // --- INITIALIZE ---
+            renderStaffingChart();
+            renderCostChart();
+            renderFinancialsChart();
+            renderStartupChart();
+            
+            updateGrowthDashboard(0);
+            updateFinancialsDashboard(0);
+        });
+    </script>
+</body>
+</html>
+
