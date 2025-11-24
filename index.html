@@ -86,7 +86,11 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900" x-data="{ 
+<body class="bg-gray-100 text-gray-900" 
+    x-data="{ 
+    isAuthenticated: false, /* NEW: Tracks successful authentication */
+    passwordInput: '',
+    authError: '',
     activePage: 'home', 
     showModal: false, 
     modalContent: '',
@@ -153,10 +157,53 @@
         }
     },
     activeBank: null,
-    quizState: {}
+    quizState: {},
+    checkPassword() {
+        if (this.passwordInput === 'SKNCBBAUK') {
+            this.isAuthenticated = true;
+            this.authError = '';
+        } else {
+            this.authError = 'Incorrect Password. Please contact info@skncbba.com for assistance.';
+        }
+    }
 }" x-cloak>
 
-    <div class="flex h-screen">
+    <!-- Password Protection Gate (New) -->
+    <div x-show="!isAuthenticated" 
+         class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full border-t-4 border-yellow-600">
+            <div class="flex items-center mb-6 justify-center">
+                <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-slate-100 text-yellow-600 font-bold text-2xl border border-yellow-600">
+                    ★
+                </span>
+                <h2 class="ml-3 text-2xl font-bold text-slate-800">SKN CBBA Training Access</h2>
+            </div>
+            
+            <p class="mb-4 text-gray-700 text-center">Please enter the security password to access the New Joiner Portal.</p>
+            
+            <form @submit.prevent="checkPassword()">
+                <input 
+                    type="password" 
+                    x-model="passwordInput"
+                    placeholder="Enter Access Code" 
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 mb-4"
+                >
+                <button 
+                    type="submit" 
+                    class="w-full bg-slate-800 text-white font-semibold py-3 rounded-lg hover:bg-slate-700 transition"
+                >
+                    Access Training
+                </button>
+            </form>
+            
+            <div x-show="authError" class="mt-4 p-3 bg-red-100 border border-red-400 text-red-800 rounded-lg text-sm text-center">
+                <p x-text="authError"></p>
+            </div>
+        </div>
+    </div>
+    <!-- End Password Protection Gate -->
+
+    <div class="flex h-screen" x-show="isAuthenticated">
         <!-- Sidebar -->
         <aside class="w-64 bg-slate-800 text-gray-300 p-4 flex flex-col fixed h-full md:relative md:translate-x-0 transform -translate-x-full transition-transform duration-200 ease-in-out z-30" 
             :class="{'translate-x-0': $store.sidebar.open, '-translate-x-full': !$store.sidebar.open}">
@@ -924,7 +971,7 @@
                     Performance is assessed quarterly for feedback, with the final bonus determination calculated **semi-annually** (June and December) based on the combined weighted average of all successful KPIs.
                 </p>
                 <!-- NEW INTERACTIVE LINK -->
-                <a href="SKNCBBA_bonus.html" target="_blank" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-lg">
+                <a href="SKNCBBA_Interactive.html" target="_blank" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-yellow-600 hover:bg-yellow-700 transition shadow-lg">
                     Explore Interactive Tools & Simulations &rarr;
                 </a>
             </section>
@@ -1424,6 +1471,8 @@
             initBankChart();
             initRiskReturnChart();
             initQuizListeners();
+            // Initial check to prevent the gate from showing briefly if JS loads slowly
+            document.querySelector('body').style.display = 'block'; 
         });
 
         function initBankChart() {
@@ -1653,4 +1702,3 @@
     </script>
 </body>
 </html>
-
