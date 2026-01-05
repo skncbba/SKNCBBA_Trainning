@@ -1,167 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Money, Swiss Style: A Fun Intro</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #0f172a;
-            color: #e5e7eb;
-        }
+<meta charset="UTF-8">
+<title>Swiss Finance Presentation</title>
 
-        header {
-            text-align: center;
-            padding: 40px 20px 10px;
-            background: radial-gradient(circle at top, #1d4ed8, #020617);
-            color: #f9fafb;
-        }
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #eef2f7;
+        color: #222;
+        line-height: 1.6;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.4rem;
-        }
+    header {
+        background: #4f46e5;
+        color: white;
+        padding: 50px 20px;
+        text-align: center;
+    }
 
-        header p {
-            margin: 10px 0 0;
-            font-size: 1.05rem;
-            opacity: 0.9;
-        }
+    header h1 {
+        margin: 0;
+        font-size: 2.6rem;
+    }
 
-        .nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding: 10px 20px 25px;
-            background: #020617;
-            border-bottom: 1px solid #1f2937;
-        }
+    header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
 
-        .nav a {
-            text-decoration: none;
-            color: #e5e7eb;
-            background: #111827;
-            padding: 8px 14px;
-            border-radius: 999px;
-            font-size: 0.9rem;
-            border: 1px solid #1f2937;
-            transition: all 0.2s ease;
-        }
+    section {
+        max-width: 900px;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-        .nav a:hover {
-            background: #1d4ed8;
-            border-color: #1d4ed8;
-        }
+    h2 {
+        color: #2563eb;
+        margin-top: 0;
+    }
 
-        main {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 30px 20px 60px;
-        }
+    h3 {
+        color: #374151;
+        margin-bottom: 6px;
+    }
 
-        section {
-            margin-bottom: 50px;
-            padding: 24px 20px;
-            border-radius: 16px;
-            background: #020617;
-            border: 1px solid #1f2937;
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-        }
+    .box {
+        background: #e0f2fe;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 15px 0;
+        border-left: 5px solid #0284c7;
+    }
 
-        section h2 {
-            margin-top: 0;
-            font-size: 1.6rem;
-            color: #bfdbfe;
-        }
+    .fun {
+        background: #fef3c7;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 5px solid #f59e0b;
+        margin: 15px 0;
+    }
 
-        .tagline {
-            font-size: 0.95rem;
-            color: #9ca3af;
-            margin-bottom: 14px;
-        }
+    .quiz {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px dashed #f0ad4e;
+    }
 
-        ul {
-            padding-left: 20px;
-        }
+    ul {
+        padding-left: 20px;
+    }
 
-        li {
-            margin-bottom: 8px;
-        }
+    .emoji {
+        font-size: 1.4rem;
+        margin-right: 6px;
+    }
 
-        .highlight {
-            color: #22c55e;
-            font-weight: 600;
-        }
+    .ascii {
+        font-family: monospace;
+        background: #f3f4f6;
+        padding: 10px;
+        border-radius: 6px;
+        margin: 15px 0;
+        white-space: pre;
+        overflow-x: auto;
+    }
+</style>
+</head>
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
+<body>
 
-        .card {
-            background: #020617;
-            border-radius: 14px;
-            border: 1px solid #1f2937;
-            padding: 14px 14px 16px;
-        }
+<header>
+    <h1>Money, Swiss Style 🧀💰</h1>
+    <p>A fun, visual, beginner‑friendly introduction to currencies, CHF, and global finance.</p>
+</header>
 
-        .card h3 {
-            margin-top: 0;
-            font-size: 1.05rem;
-            color: #93c5fd;
-        }
+<!-- SECTION 1 -->
+<section>
+    <h2>1. Money & Currencies 101 🌍</h2>
 
-        .pill {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            background: #1e293b;
-            color: #e5e7eb;
-            margin-bottom: 6px;
-        }
+    <p>Money is the “language” countries use to trade. Every country (or group of countries) has its own currency:</p>
 
-        .example-box {
-            margin-top: 12px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            background: #020617;
-            border: 1px dashed #374151;
-            font-size: 0.9rem;
-        }
+    <ul>
+        <li>🇺🇸 USD — United States Dollar</li>
+        <li>🇪🇺 EUR — Euro (used by 20+ countries)</li>
+        <li>🇨🇭 CHF — Swiss Franc</li>
+        <li>🇯🇵 JPY — Japanese Yen</li>
+        <li>🇬🇧 GBP — British Pound</li>
+    </ul>
 
-        .emoji {
-            font-size: 1.2rem;
-            margin-right: 4px;
-        }
+    <div class="box">
+        💡 <strong>Fun fact:</strong> There are 180 official currencies in the world today.
+    </div>
 
-        .big-number {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #facc15;
-        }
+    <h3>What is an exchange rate?</h3>
+    <p>An exchange rate tells you how much one currency is worth in another.</p>
 
-        .footer-note {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #9ca3af;
-            margin-top: 40px;
-        }
+    <div class="ascii">
+1 USD = 0.90 EUR  
+100 USD = 90 EUR  
+    </div>
 
-        .quiz {
-            margin-top: 14px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            background: #020617;
-            border: 1px solid #1d4ed8;
-            font-size: 0.9rem;
-        }
+    <h3>Why do exchange rates move?</h3>
+    <ul>
+        <li>Interest rates</li>
+        <li>Inflation</li>
+        <li>Political stability</li>
+        <li>Economic growth</li>
+        <li>Investor confidence</li>
+        <li>Global events (wars, elections, crises)</li>
+    </ul>
 
-        .quiz p {
-            margin: 0 0 6px;
-        }
+    <div class="fun">
+        🌟 <strong>Imagine:</strong> Currencies are like people at a party — some are calm, some are dramatic, some are unpredictable, and some are the “responsible adults” everyone trusts.
+    </div>
+</section>
 
+<!-- SECTION 2 -->
+<section>
+    <h2>2. Why the Swiss Franc (CHF) is a Safe Haven 🏔️</h2>
+
+    <p>The Swiss franc is known as a <strong>safe‑haven currency</strong>. That means investors trust it during global uncertainty.</p>
+
+    <h3>Why is CHF so trusted?</h3>
+    <ul>
+        <li>🇨🇭 <strong>Political stability:</strong> Switzerland is neutral, peaceful, and predictable.</li>
+        <li>🏦 <strong>Strong banking system:</strong> Swiss banks are conservative and well‑regulated.</li>
+        <li>📉 <strong>Low inflation:</strong> Prices in Switzerland tend to stay stable.</li>
+        <li>🛡️ <strong>Safe‑haven reputation:</strong> Investors move money into CHF during crises.</li>
+    </ul>
+
+    <div class="box">
+        💡 <strong>Example:</strong> When global markets panic, CHF often becomes stronger because people buy it for safety.
+    </div>
+
+    <h3>Historical behavior</h3>
+    <p>During major global events (2008 crisis, COVID‑19, geopolitical tensions), CHF typically:</p>
+
+    <ul>
+        <li>Strengthens against EUR and USD</li>
+        <li>Attracts institutional investors</li>
+        <li>Shows lower volatility than many currencies</li>
+    </ul>
+
+    <div class="fun">
+        💡 <strong>Fun fact:</strong> Switzerland has enough nuclear bunkers to shelter its entire population.
+    </div>
+</section>
+
+<!-- SECTION 3 -->
+<section>
+    <h2>3. The Multi‑Custodian Model 🧺🏦</h2>
+
+    <p>A <strong>custodian</strong> is a bank that safely holds assets for clients — like securities, cash, and funds.</p>
+
+    <h3>What is the multi‑custodian model?</h3>
+    <p>Instead of relying on one bank, a firm uses several custodians across different countries.</p>
+
+    <h3>Why is this better?</h3>
+    <ul>
+        <li>✔ <strong>Risk diversification:</strong> Assets are not concentrated in one place.</li>
+        <li>✔ <strong>Access to global markets:</strong> Different banks specialize in different regions.</li>
+        <li>✔ <strong>Better pricing:</strong> Competition improves service and fees.</li>
+        <li>✔ <strong>Client flexibility:</strong> Clients can choose preferred jurisdictions.</li>
+        <li>✔ <strong>Operational resilience:</strong> If one bank has issues, others continue working.</li>
+    </ul>
+
+    <div class="ascii">
+Multi‑Custodian Setup:
+----------------------
+[ Bank A - Switzerland ]
+[ Bank B - Luxembourg ]
+[ Bank C - Singapore  ]
+[ Bank D - USA        ]
+    </div>
+
+    <div class="fun">
+        💡 <strong>Analogy:</strong> It’s like keeping your valuables in several safes instead of one. If one safe is blocked, you still have access to the others.
+    </div>
+</section>
+
+<!-- SECTION 4 -->
+<section>
+    <h2>4. Client Segmentation by Geography 🌎</h2>
+
+    <p>Clients around the world have different needs, currencies, and regulations. Segmenting them helps provide better service.</p>
+
+    <h3>Examples of geographic segments</h3>
+
+    <h3>🇪🇺 Europe</h3>
+    <ul>
+        <li>Uses EUR, CHF, GBP</li>
+        <li>Strong regulatory environment</li>
+        <li>Focus on wealth preservation</li>
+    </ul>
+
+    <h3>🇦🇪 Middle East</h3>
+    <ul>
+        <li>USD‑linked currencies</li>
+        <li>Higher risk appetite</li>
+        <li>Interest in real estate & alternative investments</li>
+    </ul>
+
+    <h3>🇸🇬 Asia</h3>
+    <ul>
+        <li>Fast‑growing markets</li>
+        <li>Multi‑currency portfolios</li>
+        <li>Tech‑driven investment themes</li>
+    </ul>
+
+    <h3>🇧🇷 Latin America</h3>
+    <ul>
+        <li>Local currency volatility</li>
+        <li>Preference for USD or CHF stability</li>
+        <li>Focus on capital protection</li>
+    </ul>
+
+    <div class="box">
+        💡 <strong>Why segmentation matters:</strong>  
+        It ensures clients get solutions that match their culture, currency, and financial environment.
+    </div>
+</section>
+
+<!-- SECTION 5 -->
+<section>
+    <h2>5. Mini Quiz 🎉</h2>
+
+    <div class="quiz">
+        <p>1. Why do investors move into CHF during global uncertainty?</p>
+        <p>2. What is the main benefit of using multiple custodians?</p>
+        <p>3. Why do clients in different regions need different financial solutions?</p>
+        <p>4. What makes Switzerland economically stable?</p>
+    </div>
+</section>
+
+</body>
+</html>
