@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond the Alps: Swiss Banking Basics</title>
+    <style>
+        :root {
+            --swiss-red: #D52B1E;
+            --navy: #1A2B3C;
+            --light-grey: #F4F7F9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-grey);
+            color: var(--navy);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--swiss-red);
+            color: var(--white);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+            border-top: 5px solid var(--swiss-red);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        h2 {
+            color: var(--swiss-red);
+            margin-top: 0;
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .highlight {
+            background: #fff4f4;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .fun-fact {
+            font-style: italic;
+            border-left: 4px solid var(--swiss-red);
+            padding-left: 15px;
+            margin-top: 15px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🇨🇭 Beyond the Alps</h1>
+    <p>Your "No-Finance-Degree" Guide to Swiss Wealth Management</p>
+</header>
+
+<div class="container">
+    <div class="intro">
+        <h2>Welcome to the Team!</h2>
+        <p>Today we break down the "Magic" of Switzerland into three simple pillars. No boring spreadsheets allowed!</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <span class="icon">🛡️</span>
+            <h2>The Safe Haven (CHF)</h2>
+            <p>Most currencies act like a roller coaster. The <strong>Swiss Franc (CHF)</strong> acts like a rock.</p>
+            <ul>
+                <li><strong>Stability:</strong> While others panic, the CHF stays calm.</li>
+                <li><strong>Safe Haven:</strong> When the world gets messy, everyone runs to buy CHF to stay safe.</li>
+            </ul>
+            <div class="fun-fact">Analogy: The CHF is the "Gold Medal" of paper money. It doesn't lose its shine.</div>
+        </div>
+
+        <div class="card">
+            <span class="icon">🧺</span>
+            <h2>Multi-Custodian Model</h2>
+            <p>We never put all our gold in one shoebox. We use multiple "baskets" (Banks).</p>
+            <ul>
+                <li><strong>Diversification:</strong> We spread the wealth across different top banks.</li>
+                <li><strong>Best of Breed:</strong> Bank A is good at cash, Bank B is good at gold. We get both!</li>
+            </ul>
+            <div class="fun-fact">Analogy: It's like having a master key to the best vaults in the world.</div>
+        </div>
+
+        <div class="card">
+            <span class="icon">🌍</span>
+            <h2>Global Client Needs</h2>
+            <p>Different countries have different "financial flavors."</p>
+            <ul>
+                <li><strong>LatAm:</strong> Looking for protection from inflation.</li>
+                <li><strong>Middle East:</strong> Focus on family legacy and growth.</li>
+                <li><strong>Europe:</strong> Focus on tax efficiency and privacy.</li>
+            </ul>
+            <div class="fun-fact">Analogy: You wouldn't wear a winter coat in Dubai. We tailor the "outfit" to the location.</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; text-align: center; background: white; padding: 30px; border-radius: 12px;">
+        <h2>🚀 Ready for Day 1?</h2>
+        <p>You don't need to be a math genius. You just need to be a <strong>Trust Builder</strong>.</p>
+        <span class="highlight">Next Step: Learning Structured Products (The Lego Bricks of Finance)</span>
+    </div>
+</div>
+
+<footer>
+    &copy; 2026 Swiss Banking Sales Training | Confidential & Internal Use Only
+</footer>
+
+</body>
+</html>
