@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKN | Structured Products Dashboard</title>
+    <style>
+        :root {
+            --bg-black: #0a0a0a;
+            --card-gray: #161616;
+            --skn-green: #a3cc39;
+            --text-white: #ffffff;
+            --text-dim: #94a3b8;
+            --border: #262626;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.98);
+            padding: 20px 50px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar img { height: 45px; width: auto; }
+
+        .container { max-width: 1200px; margin: 50px auto; padding: 0 20px; }
+
+        .header-card {
+            background: linear-gradient(145deg, #1a1a1a 0%, #0a0a0a 100%);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border-left: 5px solid var(--skn-green);
+        }
+
+        .header-card h1 { font-size: 2.4rem; margin: 0 0 10px 0; font-weight: 800; }
+        .header-card h1 span { color: var(--skn-green); }
+        .header-card p { color: var(--text-dim); max-width: 800px; font-size: 1.1rem; }
+
+        .benefits { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 30px; }
+        .benefit { background: #1c1c1c; padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .benefit strong { color: var(--skn-green); display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-gray);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            table-layout: fixed;
+        }
+
+        .main-table th { background: #222; padding: 25px; text-align: center; color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .main-table td { padding: 25px; border-bottom: 1px solid var(--border); text-align: center; }
+        .main-table td:first-child { text-align: left; background: #1a1a1a; width: 200px; color: var(--text-dim); font-weight: 600; }
+
+        .green-hl { color: var(--skn-green); font-weight: 800; font-size: 1.4rem; }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; }
+        .btn {
+            background: transparent;
+            border: 1px solid var(--skn-green);
+            color: var(--skn-green);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-solid { background: var(--skn-green); color: #000; }
+        .btn:hover { background: var(--skn-green); color: #000; box-shadow: 0 0 20px rgba(163, 204, 57, 0.3); }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none;
+            justify-content: center; align-items: center; z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-body {
+            background: #1a1a1a; width: 90%; max-width: 750px; padding: 45px;
+            border-radius: 24px; position: relative; border: 1px solid var(--border);
+            max-height: 85vh; overflow-y: auto;
+        }
+
+        .close { position: absolute; top: 25px; right: 25px; font-size: 2rem; cursor: pointer; color: var(--text-dim); }
+        .strat-sec { margin-bottom: 30px; }
+        .strat-label { color: var(--skn-green); font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 10px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .stat-item { background: #000; padding: 25px; border-radius: 15px; text-align: center; border: 1px solid var(--border); }
+        .stat-item span { display: block; font-size: 1.8rem; font-weight: 800; margin-top: 5px; }
+        .profit-hl { border-color: var(--skn-green); background: rgba(163, 204, 57, 0.05); grid-column: span 2; }
+        .advisor-box { background: #222; border-left: 4px solid var(--skn-green); padding: 20px; border-radius: 0 10px 10px 0; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <img src="https://skn.co.il/wp-content/uploads/2024/08/horizontal-green.png" alt="SKN Logo">
+    </nav>
+
+    <div class="container">
+        <div class="header-card">
+            <h1>Structured <span>Alpha</span> Solutions</h1>
+            <p>Advanced investment management utilizing disciplined risk frameworks to access global sector leaders and indices.</p>
+            <div class="benefits">
+                <div class="benefit"><strong>Improved Returns</strong> Enhanced upside potential relative to direct equity exposure. </div>
+                <div class="benefit"><strong>Sector Focus</strong> Deep exposure to U.S. Banking and Global Indices. </div>
+                <div class="benefit"><strong>Risk Protection</strong> Barriers and capital protection levels from 70% to 100%. </div>
+            </div>
+        </div>
+
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th>Metrics</th>
+                    <th>Case 1: US Banking</th>
+                    <th>Case 2: Global Basket</th>
+                    <th>Case 3: Capital Protected</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ISIN Reference</td>
+                    <td style="font-family: monospace;">XS3090021133</td>
+                    <td style="font-family: monospace;">XS2482736662</td>
+                    <td style="font-family: monospace;">XS2814530171</td>
+                </tr>
+                <tr>
+                    <td>Participation</td>
+                    <td class="green-hl">179%</td>
+                    <td class="green-hl">150%</td>
+                    <td class="green-hl">100%</td>
+                </tr>
+                <tr>
+                    <td>Protection</td>
+                    <td>70% Barrier</td>
+                    <td>70% Barrier</td>
+                    <td style="color:var(--skn-green)">100% Full Floor</td>
+                </tr>
+                <tr>
+                    <td>Action</td>
+                    <td>
+                        <div class="btn-stack">
+                            <button class="btn btn-solid" onclick="openMod('p1')">Strategy View</button>
+                            <button class="btn" onclick="openMod('e1')">Case Performance</button>
+                            <a class="btn" href="https://drive.google.com/file/d/1Sow_VyhOacamAmiODiBxTwaumeIWE9tf/view?usp=drive_link" target="_blank">Term Sheet</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-stack">
+                            <button class="btn btn-solid" onclick="openMod('p2')">Strategy View</button>
+                            <button class="btn" onclick="openMod('e2')">Case Performance</button>
+                            <a class="btn" href="https://drive.google.com/file/d/10RLYEm5k8OIrL22ai6_4hd89rRb4rAE-/view?usp=drive_link" target="_blank">Term Sheet</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="btn-stack">
+                            <button class="btn btn-solid" onclick="openMod('p3')">Strategy View</button>
+                            <button class="btn" onclick="openMod('e3')">Case Performance</button>
+                            <a class="btn" href="https://drive.google.com/file/d/126IQNMfc7CuiTqbzCEtD0SP-yL6Xn8Lu/view?usp=drive_link" target="_blank">Term Sheet</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="p1" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2 style="margin-top:0">Case 1: The Banking Multiplier</h2>
+        <div class="strat-sec">
+            <span class="strat-label">Think of this as a smart way to invest in the stock market where you get a huge 'bonus' for being right, but you also have a safety net if things go slightly sideways.</span>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">How it Works</span>
+            <p>This is a 5-Year Bonus Certificate issued by Goldman Sachs. Instead of just following one stock, it usually tracks a small group (a 'basket') of indices or stocks.<br>
+The "Worst-of" Feature: Your return is based on the performance of the stock in that group that performs the least well.<br>
+The 179% Participation (The Upside): This is the star of the show. If the market goes up, Goldman Sachs pays you 1.79 times the return of that worst-performing asset.<br>
+Example: If the worst stock in the basket grows by 10%, you don't just get 10%—you get 17.9%. It's like a supercharged version of traditional investing.<br>
+The 70% Barrier (The Safety Net): You are protected against losses as long as the worst-performing asset doesn't drop by more than 30% from its starting price. If it stays above that level, your initial investment (your principal) is safe. </p>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">Market Perspective</span>
+            <p>The US Banking sector (BofA, JPM, MS, Wells Fargo) offers foundational stability. This structure converts standard sector growth into outsized gains by accepting a "Worst-of" mechanism. </p>
+        </div>
+        <div class="advisor-box">
+            <span class="strat-label">Fianl Say</span>
+            <p>"We are using Goldman's institutional pricing to give you nearly 2x the profit of the biggest banks in the world. It’s a high-conviction play with a built-in safety net." </p>
+        </div>
+    </div></div>
+
+    <div id="e1" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2>Performance Data: US Banking</h2>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-label">Initial Invested</span><span>$500,000</span></div>
+            <div class="stat-item"><span class="stat-label">Sale Value</span><span>$571,500</span></div>
+            <div class="stat-item profit-hl"><span class="stat-label">Realized Profit (14.30%)</span><span style="color:var(--skn-green)">+$71,500</span></div>
+        </div>
+    </div></div>
+
+    <div id="p2" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2>Case 2: Global Diversified Engine</h2>
+        <div class="strat-sec">
+            <span class="strat-label">This investment allows you to profit from four different major companies or indices simultaneously. Even better, you get paid in US Dollars, regardless of what happens to the exchange rates of the underlying assets.</span>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">How it Works</span>
+            <p>The "Basket" Structure: Instead of betting on just one thing, your money is spread equally (25% each) across four different assets. This smooths out the ride because you aren't reliant on a single company's performance.<br>
+The "Quanto" Advantage: This is a huge selling point. If the assets in the basket are international (e.g., European or Japanese stocks), a "Quanto" feature ensures that currency fluctuations won't hurt your profit. You get your returns purely based on stock performance, paid out in USD.<br>
+150% Participation (The Turbo): For every 1% the basket grows, you earn 1.5%. This 50% "bonus" on top of market gains is designed to help a portfolio outperform standard benchmarks.<br>
+The 70% Barrier: You have a 30% cushion. As long as the basket doesn't fall by more than 30% at the end of the 4.5-year term, your original investment is returned in full, even if the market is slightly down. </p>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">Market Perspective</span>
+            <p>Exposure to FTSE, S&P 500, SMI, and STOXX 600. Neutralizing the risk of any single economy stalling. </p>
+        </div>
+        <div class="advisor-box">
+            <span class="strat-label">Final Say</span>
+            <p>"This replaces four different index funds with one smart USD-based engine. You get a 50% bonus on the world's average growth without currency headaches." </p>
+        </div>
+    </div></div>
+
+    <div id="e2" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2>Performance Data: Global Basket</h2>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-label">Initial Invested</span><span>$185,000</span></div>
+            <div class="stat-item"><span class="stat-label">Sale Value</span><span>$220,890</span></div>
+            <div class="stat-item profit-hl"><span class="stat-label">Realized Profit (19.40%)</span><span style="color:var(--skn-green)">+$35,890</span></div>
+        </div>
+    </div></div>
+
+    <div id="p3" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2>Case 3: Capital Preservation Anchor</h2>
+        <div class="strat-sec">
+            <span class="strat-label">This is what we call a 'Safety-First' growth plan. You get to participate in the stock market's growth, but Goldman Sachs guarantees that even if the market crashes to zero, you will get 100% of your initial investment back at the end of the term.</span>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">How it Works</span>
+            <p>100% Capital Protection: This is the ultimate safety net. Your principal is protected by Goldman Sachs. Unlike the other products where a 30% drop could cause losses, here, your downside risk is effectively zero (provided you hold it to maturity).<br>
+Equally Weighted Basket: Your return isn't tied to the "worst" stock. Instead, it's the average performance of four different assets. This makes the return much more stable and less prone to being dragged down by one "bad apple."<br>
+100% Participation (The Tracker): You get the full benefit of the basket's average growth. If the basket goes up 20% over the 4.5 years, you earn 20%.<br>
+The "Quanto" Feature: Just like the previous version, you are protected from currency swings. If the stocks are in Euros or Yen, you don't care—your profit is calculated and paid in USD. </p>
+        </div>
+        <div class="strat-sec">
+            <span class="strat-label">Market Perspective</span>
+            <p>Targeting the Nikkei, S&P, SMI, and Euro Stoxx. Ideal for allocations that need to beat inflation without risking the core principal. </p>
+        </div>
+        <div class="advisor-box">
+            <span class="strat-label">Final Say</span>
+            <p>"This is a win-no-lose scenario. We capture global recovery, but if a crash occurs, you walk away with 100% of your capital. It’s the ultimate sleep-at-night investment." </p>
+        </div>
+    </div></div>
+
+    <div id="e3" class="modal" onclick="closeMod(event)"><div class="modal-body"><span class="close" onclick="closeAll()">&times;</span>
+        <h2>Performance Data: Protected</h2>
+        <div class="stat-grid">
+            <div class="stat-item"><span class="stat-label">Initial Invested</span><span>$100,000</span></div>
+            <div class="stat-item"><span class="stat-label">Sale Value</span><span>$108,020</span></div>
+            <div class="stat-item profit-hl"><span class="stat-label">Realized Profit (8.20%)</span><span style="color:var(--skn-green)">+$8,020</span></div>
+        </div>
+    </div></div>
+
+    <script>
+        function openMod(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeAll() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
+        function closeMod(e) { if(e.target.className === 'modal') closeAll(); }
+    </script>
+</body>
+</html>
